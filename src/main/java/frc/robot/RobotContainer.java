@@ -4,17 +4,35 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.SwerveSubsystems.*;
+import frc.robot.Commands.*;
+import frc.robot.Information.*;
 
 public class RobotContainer {
   public RobotContainer() {
-    configureBindings();
+
   }
 
-  private void configureBindings() {}
+  // Base inits
+  // Controllers
+  XboxController xbox = new XboxController(2);
 
-  public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
+  // Subsystems
+  DriveSubsystem driveSub = new DriveSubsystem();
+  OdometrySubsystem odomSub = new OdometrySubsystem(driveSub);
+  TagSubsystem tagSub = new TagSubsystem(odomSub);
+
+  // Commands from files
+  XBOXDriveCommand driveCommand = new XBOXDriveCommand(driveSub, xbox, tagSub, odomSub);
+
+  // Command scheduler
+  {
+    driveSub.setDefaultCommand(driveCommand);
+
   }
+
+  // Autonomous chooser
+
+  // return new DeltaPoseCommand(0, 1.5, 0, driveSub, odomSub);
 }

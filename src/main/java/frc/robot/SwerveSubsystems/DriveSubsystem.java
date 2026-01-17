@@ -48,7 +48,6 @@ public class DriveSubsystem extends SubsystemBase {
   /** Creates a new TestSubsystem. */
   public DriveSubsystem() {
     Shuffleboard.getTab("Navigation").addDoubleArray("Set Angle gilcswdicqewe", () -> {return new double[] {setAngle};});
-    
   }
 
 

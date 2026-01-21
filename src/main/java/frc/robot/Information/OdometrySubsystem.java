@@ -33,6 +33,7 @@ import frc.robot.SwerveSubsystems.SwerveDriveModule;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.wpilibj.Timer;
 
+
 public class OdometrySubsystem extends SubsystemBase {
 
     DriveSubsystem driveSub;
@@ -105,7 +106,8 @@ public class OdometrySubsystem extends SubsystemBase {
         pose = m_poseEstimator.getEstimatedPosition();
 
         field.setRobotPose(pose);
-        SmartDashboard.putData("Field", field);
+        SmartDashboard.putNumber("X", pose.getX());
+        SmartDashboard.putNumber("Y", pose.getY());
     }
 
     public double getGyroAngle() {

@@ -6,6 +6,10 @@ package frc.robot.Information;
 
 import org.photonvision.PhotonCamera;
 
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class PhotonSubsystem extends SubsystemBase {
@@ -22,28 +26,38 @@ public class PhotonSubsystem extends SubsystemBase {
     // this.tagCamera = tagCamera;
   }
 
-  // get position for the robot as a double array
-  public double[] getPose() {
+  // get pose as a Pose2d object, not a pose estimation: use all systems to get pose
+  public Pose2d getPosePhoton() {
     var result = tagCamera.getLatestResult();
     if (result.hasTargets()) {
       var target = result.getBestTarget();
-      var pose = target.getBestCameraToTarget().getTranslation();
-      return new double[] { pose.getX(), pose.getY(), pose.getZ() };
+      var pose = target.getBestCameraToTarget();
+      var translation = pose.getTranslation();
+      var rotation = pose.getRotation();
+      return new Pose2d (translation.toTranslation2d(), rotation.toRotation2d());
     } else {
-      return new double[] { 0.0, 0.0, 0.0 };
+      return new Pose2d();
     }
   }
 
+  
+
   // get rotation as a double
-  public double getRot() {
+  // TODO change to return a Rotation2d object
+  public Rotation2d getRot() {
     var result = tagCamera.getLatestResult();
     if (result.hasTargets()) {
       var target = result.getBestTarget();
       var pose = target.getBestCameraToTarget().getRotation();
-      return pose.getZ();
+      return pose.toRotation2d();
     } else {
-      return 0.0;
+      return new Rotation2d(0.0);
     }
+  }
+
+  public boolean hasTargets() {
+    var result = tagCamera.getLatestResult();
+    return result.hasTargets();
   }
 
   @Override

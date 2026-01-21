@@ -20,7 +20,8 @@ public class RobotContainer {
 
   // Subsystems
   DriveSubsystem driveSub = new DriveSubsystem();
-  OdometrySubsystem odomSub = new OdometrySubsystem(driveSub);
+  PhotonSubsystem photonSub = new PhotonSubsystem();
+  OdometrySubsystem odomSub = new OdometrySubsystem(driveSub, photonSub);
   TagSubsystem tagSub = new TagSubsystem(odomSub);
 
   // Commands from files

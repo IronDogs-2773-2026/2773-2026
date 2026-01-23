@@ -82,6 +82,7 @@ public class SwerveDriveModule {
     driveMotor.set(speed * direction);
   }
 
+  
   public double canCoderPositionAdjusted() {
     // position [-0.5..0.5)
     double value = encoder.getAbsolutePosition().getValueAsDouble() - alpha;
@@ -90,7 +91,23 @@ public class SwerveDriveModule {
     if (value >= 0.5)
       value -= 1.0;
     return -value * 2 * Math.PI;
+
   }
+    public double canCoderPositionAdjustedForOdometry() {
+    // position [-0.5..0.5)
+    double value = encoder.getAbsolutePosition().getValueAsDouble() - alpha;
+    if (value < -0.5)
+      value += 1.0;
+    if (value >= 0.5)
+      value -= 1.0;
+    // return -value * 2 * Math.PI;
+    double angle = -value * 2 * Math.PI;
+    // x = -x;
+    angle = -Math.PI/2 + angle;
+    return -angle;
+
+  }
+
 
   public void reset() {
     pidRotate.setSetpoint(0);
@@ -110,7 +127,7 @@ public class SwerveDriveModule {
 
   public SwerveModulePosition getSwervePosition() {
     return new SwerveModulePosition(
-        distanceEncoderPosition(), new Rotation2d(canCoderPositionAdjusted()));
+        distanceEncoderPosition(), new Rotation2d(canCoderPositionAdjustedForOdometry()));
   }
 
   public SwerveModuleState getSwerveState() {

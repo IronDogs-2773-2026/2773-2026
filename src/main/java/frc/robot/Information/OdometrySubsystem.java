@@ -66,7 +66,7 @@ public class OdometrySubsystem extends SubsystemBase {
 
         m_poseEstimator = new SwerveDrivePoseEstimator(
                 m_kinematics,
-                gyro.getRotation2d(),
+                gyro.getRotation2d().times(-1),
                 driveSub.getPositions(),
                 new Pose2d());
 
@@ -93,7 +93,7 @@ public class OdometrySubsystem extends SubsystemBase {
         Rotation2d gyroAngle = new Rotation2d(gyro.getAngle() * Math.PI / 180);
         m_poseEstimator.updateWithTime(
                 Timer.getFPGATimestamp(),
-                gyroAngle,
+                gyroAngle.times(-1),
                 driveSub.getPositions());
 
         if (photonSub.hasTargets()) {
@@ -129,9 +129,9 @@ public class OdometrySubsystem extends SubsystemBase {
         pose = newPose;
     }
 
-    public ChassisSpeeds getChassisSpeeds() {
-        return m_kinematics.toChassisSpeeds(driveSub.getStates());
-    }
+    // public ChassisSpeeds getChassisSpeeds() {
+    //     return m_kinematics.toChassisSpeeds(driveSub.getStates());
+    // }
 
     public double getX() {
         return pose.getX();

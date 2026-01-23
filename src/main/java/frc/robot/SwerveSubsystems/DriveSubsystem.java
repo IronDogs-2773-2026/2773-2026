@@ -31,8 +31,7 @@ public class DriveSubsystem extends SubsystemBase {
   public PIDController pid = new PIDController(p, i, d);
 
   
-  public SwerveModulePosition[] getPositions()
-  {
+  public SwerveModulePosition[] getPositions() {
     return new SwerveModulePosition[] {
     flMotor.getSwervePosition(), frMotor.getSwervePosition(),
     blMotor.getSwervePosition(), brMotor.getSwervePosition()

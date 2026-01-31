@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.SwerveSubsystems.DriveSubsystem;
 import frc.robot.SwerveSubsystems.SwerveDriveModule;
+import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.wpilibj.Timer;
 
@@ -96,12 +97,14 @@ public class OdometrySubsystem extends SubsystemBase {
                 gyroAngle.times(-1),
                 driveSub.getPositions());
 
-        if (photonSub.hasTargets()) {
-            Pose2d photonPose = photonSub.getPosePhoton();
-            m_poseEstimator.addVisionMeasurement(
+            Pose2d photonPose = photonSub.getPose2d();
+            if (photonPose != null) {
+                m_poseEstimator.addVisionMeasurement(
                     photonPose,
-                    Timer.getFPGATimestamp());
-        }
+                    Timer.getFPGATimestamp(),
+                    photonSub.getStdDevs()
+                );
+                }
 
         pose = m_poseEstimator.getEstimatedPosition();
 

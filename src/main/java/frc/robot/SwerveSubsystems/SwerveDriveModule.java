@@ -31,8 +31,8 @@ public class SwerveDriveModule {
   private PIDController pidRotate;
 
   private static double DriveMotorWheelGearRatio = 1.0 / 6.75;
-  private static double EncoderMagicRevolutionNumber = 0.047964; //  42/1024 = resolution/1024
-  
+  private static double EncoderMagicRevolutionNumber = 0.047964; // 42/1024 = resolution/1024
+
   private double oldDistance = 0.0;
   private double velocity = 0.0;
 
@@ -82,7 +82,6 @@ public class SwerveDriveModule {
     driveMotor.set(speed * direction);
   }
 
-  
   public double canCoderPositionAdjusted() {
     // position [-0.5..0.5)
     double value = encoder.getAbsolutePosition().getValueAsDouble() - alpha;
@@ -93,7 +92,8 @@ public class SwerveDriveModule {
     return -value * 2 * Math.PI;
 
   }
-    public double canCoderPositionAdjustedForOdometry() {
+
+  public double canCoderPositionAdjustedForOdometry() {
     // position [-0.5..0.5)
     double value = encoder.getAbsolutePosition().getValueAsDouble() - alpha;
     if (value < -0.5)
@@ -103,7 +103,7 @@ public class SwerveDriveModule {
     // return -value * 2 * Math.PI;
     double angle = -value * 2 * Math.PI;
     // x = -x;
-    angle = -Math.PI/2 + angle;
+    angle = -Math.PI / 2 + angle;
     return -angle;
 
   }

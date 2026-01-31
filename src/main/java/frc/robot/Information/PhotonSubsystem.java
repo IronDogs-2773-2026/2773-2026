@@ -5,50 +5,51 @@
 package frc.robot.Information;
 
 import org.photonvision.PhotonCamera;
+import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class PhotonSubsystem extends SubsystemBase {
   /** Creates a new PhotonSubsystem. */
 
   // create a photon camera object
-  PhotonCamera tagCamera = new PhotonCamera("tagCamera");
+  PhotonCamera tagCamera = new PhotonCamera("USB_Camera");
 
-  // First, we create a new VisionSystemSim to represent our camera and
-  // coprocessor running PhotonVision, and moving around our simulated field.
-  
   // this be the subsystem
   public PhotonSubsystem() {
-    // this.tagCamera = tagCamera;
+    this.tagCamera = tagCamera;
   }
 
-  // get pose as a Pose2d object, not a pose estimation: use all systems to get pose
+  // get pose as a Pose2d object, not a pose estimation: use all systems to get
+  // pose
   public Pose2d getPosePhoton() {
-    var result = tagCamera.getLatestResult();
+    PhotonPipelineResult result = tagCamera.getLatestResult();
     if (result.hasTargets()) {
-      var target = result.getBestTarget();
-      var pose = target.getBestCameraToTarget();
-      var translation = pose.getTranslation();
-      var rotation = pose.getRotation();
-      return new Pose2d (translation.toTranslation2d(), rotation.toRotation2d());
+      PhotonTrackedTarget target = result.getBestTarget();
+      Transform3d pose = target.getBestCameraToTarget();
+      Translation3d translation = pose.getTranslation();
+      Rotation3d rotation = pose.getRotation();
+      return new Pose2d(translation.toTranslation2d(), rotation.toRotation2d());
     } else {
       return new Pose2d();
     }
   }
 
-  
-
   // get rotation as a Rotation2d
   // this method is unused, check for possible uses
   public Rotation2d getRot() {
-    var result = tagCamera.getLatestResult();
+    PhotonPipelineResult result = tagCamera.getLatestResult();
     if (result.hasTargets()) {
-      var target = result.getBestTarget();
-      var pose = target.getBestCameraToTarget().getRotation();
+      PhotonTrackedTarget target = result.getBestTarget();
+      Rotation3d pose = target.getBestCameraToTarget().getRotation();
       return pose.toRotation2d();
     } else {
       return new Rotation2d(0.0);
@@ -56,7 +57,7 @@ public class PhotonSubsystem extends SubsystemBase {
   }
 
   public boolean hasTargets() {
-    var result = tagCamera.getLatestResult();
+    PhotonPipelineResult result = tagCamera.getLatestResult();
     return result.hasTargets();
   }
 

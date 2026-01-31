@@ -4,6 +4,8 @@
 
 package frc.robot.Information;
 
+import java.util.List;
+
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
@@ -31,7 +33,7 @@ public class PhotonSubsystem extends SubsystemBase {
   // get pose as a Pose2d object, not a pose estimation: use all systems to get
   // pose
   public Pose2d getPosePhoton() {
-    PhotonPipelineResult result = tagCamera.getLatestResult();
+    List<PhotonPipelineResult> result = tagCamera.getAllUnreadResults();
     if (result.hasTargets()) {
       PhotonTrackedTarget target = result.getBestTarget();
       Transform3d pose = target.getBestCameraToTarget();
@@ -42,6 +44,8 @@ public class PhotonSubsystem extends SubsystemBase {
       return new Pose2d();
     }
   }
+
+  private getBestT
 
   // get rotation as a Rotation2d
   // this method is unused, check for possible uses

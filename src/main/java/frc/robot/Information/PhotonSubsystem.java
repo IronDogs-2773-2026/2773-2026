@@ -27,7 +27,7 @@ public class PhotonSubsystem extends SubsystemBase {
 
   // this be the subsystem
   public PhotonSubsystem() {
-    this.tagCamera = tagCamera;
+    // this.tagCamera = tagCamera;
   }
 
   // get pose as a Pose2d object, not a pose estimation: use all systems to get
@@ -45,7 +45,9 @@ public class PhotonSubsystem extends SubsystemBase {
     }
   }
 
-  private getBestT
+  private getBestTarget {
+    
+  }
 
   // get rotation as a Rotation2d
   // this method is unused, check for possible uses

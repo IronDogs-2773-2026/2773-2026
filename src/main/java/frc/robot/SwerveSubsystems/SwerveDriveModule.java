@@ -20,6 +20,8 @@ import com.revrobotics.RelativeEncoder;
 
 /** Add your docs here. */
 public class SwerveDriveModule {
+  
+  // Variables O:
   private static final double ROTATION_LIMIT_SPEED = 0.7;
 
   public SparkMax driveMotor;
@@ -33,9 +35,11 @@ public class SwerveDriveModule {
   private static double DriveMotorWheelGearRatio = 1.0 / 6.75;
   private static double EncoderMagicRevolutionNumber = 0.047964; //  42/1024 = resolution/1024
   
+  // unused variables (maybe figure out what they were supposed to do)
   private double oldDistance = 0.0;
   private double velocity = 0.0;
 
+  // Constructer :D
   public SwerveDriveModule(int driveId, int rotateId, int encoderId, double alpha) {
     driveMotor = new SparkMax(driveId, frc.robot.Constants.motorType);
     rotateMotor = new SparkMax(rotateId, frc.robot.Constants.motorType);
@@ -47,26 +51,33 @@ public class SwerveDriveModule {
     distanceEncoder.setPosition(0);
   }
 
+  // Gets the position of the robot based on how far it has moved
   public double distanceEncoderPosition() {
     return distanceEncoder.getPosition() / EncoderMagicRevolutionNumber * DriveMotorWheelGearRatio
         * Constants.WheelCircumference;
   }
 
+  // turns on the motors based on the speed and rotation
   public void drive(double speed, double rotate) {
     driveMotor.set(speed);
     rotateMotor.set(rotate);
   }
 
+  
   public void directionalDrive(double speed, double angle) {
     pidRotate.setSetpoint(0);
+    // TODO Change canCoderPositionAdjusted, it bad use 
     double pos = canCoderPositionAdjusted() - angle;
+
+    // -PI =< pos < PI
     while (pos < -Math.PI)
       pos += 2 * Math.PI;
     while (pos >= Math.PI)
       pos -= 2 * Math.PI;
-    // -PI =< pos < PI
 
     double direction = 1.0;
+
+    // negates direction if position is outside of +- pi / 2
     if (pos < -Math.PI / 2) {
       direction = -1.0;
       pos += Math.PI;

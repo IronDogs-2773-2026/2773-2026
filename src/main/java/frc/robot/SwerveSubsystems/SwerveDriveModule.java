@@ -108,7 +108,6 @@ public class SwerveDriveModule {
 
   }
 
-
   public void reset() {
     pidRotate.setSetpoint(0);
     double s = pidRotate.calculate(canCoderPositionAdjusted());

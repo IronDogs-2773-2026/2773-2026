@@ -42,8 +42,8 @@ public class PhotonSubsystem extends SubsystemBase {
 
   
 
-  // get rotation as a double
-  // TODO change to return a Rotation2d object
+  // get rotation as a Rotation2d
+  // this method is unused, check for possible uses
   public Rotation2d getRot() {
     var result = tagCamera.getLatestResult();
     if (result.hasTargets()) {

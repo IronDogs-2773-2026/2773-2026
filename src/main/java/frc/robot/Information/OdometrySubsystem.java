@@ -90,7 +90,7 @@ public class OdometrySubsystem extends SubsystemBase {
     // .getStructArrayTopic("MyStates", SwerveModuleState.struct).publish();
     @Override
     public void periodic() {
-        Rotation2d gyroAngle = new Rotation2d(gyro.getAngle() * Math.PI / 180);
+        Rotation2d gyroAngle = new Rotation2d(gyro.getAngle() * Math.PI / 180); // potentially move declaration outside of loop
         m_poseEstimator.updateWithTime(
                 Timer.getFPGATimestamp(),
                 gyroAngle.times(-1),
@@ -110,6 +110,10 @@ public class OdometrySubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Y", pose.getY());
     }
 
+    /*
+    * looks weird, don't touch -- if I git diff it and it isn't the 
+    * same we are going to upload a picture of your dog to the internet
+    */
     public double getGyroAngle() {
         double angle = (gyro.getAngle() - 0) / 180.0 * Math.PI;
         while (angle > Math.PI) {

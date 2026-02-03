@@ -51,6 +51,7 @@ public class PhotonSubsystem extends SubsystemBase {
     m_photonEstimator = new PhotonPoseEstimator(kTagLayout, kRobotToCam);
   }
 
+  // Does not output, updates curStdDevs to account for vision innaccuracy.
   private void updateStdDevs(Optional<EstimatedRobotPose> estimates, List<PhotonTrackedTarget> targets) {
     if (estimates.isEmpty()) {
       curStdDevs = Constants.SingleTagStdDevs;
@@ -76,8 +77,9 @@ public class PhotonSubsystem extends SubsystemBase {
           estStdDevs = Constants.SingleTagStdDevs;
         if (numTags == 1 && avgDist > 4)
           estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-        else
+        else {
           estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
+        }
         curStdDevs = estStdDevs;
       }
     }
@@ -98,7 +100,8 @@ public class PhotonSubsystem extends SubsystemBase {
     }
   }
 
-  // returns standard deviations as a matrix, passed to addVisionMeasurements to account for vision innaccuracies
+  // returns standard deviations as a matrix, passed to addVisionMeasurements to
+  // account for vision innaccuracies
   public Matrix<N3, N1> getStdDevs() {
     return curStdDevs;
   }

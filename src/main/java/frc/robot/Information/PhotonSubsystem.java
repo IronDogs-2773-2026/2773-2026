@@ -50,7 +50,10 @@ public class PhotonSubsystem extends SubsystemBase {
   // this be the subsystem
   public PhotonSubsystem() {
     tagCamera = new PhotonCamera(Constants.CameraName);
-    m_photonEstimator = new PhotonPoseEstimator(kTagLayout, kRobotToCam);
+
+    m_photonEstimator = new PhotonPoseEstimator(
+        kTagLayout,
+        kRobotToCam);
   }
 
   // Does not output, updates curStdDevs to account for vision innaccuracy.
@@ -87,18 +90,15 @@ public class PhotonSubsystem extends SubsystemBase {
     }
   }
 
-  Optional<EstimatedRobotPose> estimates;
+  Optional<EstimatedRobotPose> poseEstimatorPose;
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    estimates = Optional.empty();
+    poseEstimatorPose = Optional.empty();
     for (PhotonPipelineResult res : tagCamera.getAllUnreadResults()) {
-      estimates = m_photonEstimator.estimateLowestAmbiguityPose(res);
-      if (estimates.isEmpty()) {
-        estimates = m_photonEstimator.estimateLowestAmbiguityPose(res);
-      }
-      updateStdDevs(estimates, res.getTargets());
+      poseEstimatorPose = m_photonEstimator.estimateLowestAmbiguityPose(res);
+      updateStdDevs(poseEstimatorPose, res.getTargets());
     }
   }
 
@@ -112,9 +112,8 @@ public class PhotonSubsystem extends SubsystemBase {
   public Pose2d getPose2d() {
     Pose2d estimate;
     try {
-      estimate = estimates.get().estimatedPose.toPose2d();
-    }
-    catch (NoSuchElementException e) {
+      estimate = poseEstimatorPose.get().estimatedPose.toPose2d();
+    } catch (NoSuchElementException e) {
       estimate = new Pose2d();
     }
     return estimate;

@@ -59,10 +59,10 @@ public class OdometrySubsystem extends SubsystemBase {
         this.driveSub = driveSub;
         this.photonSub = photonSub;
         modules = driveSub.modules;
-        // m_odometry = new SwerveDriveOdometry(
-        // m_kinematics, gyro.getRotation2d(),
-        // driveSub.getPositions(),
-        // new Pose2d(0.0, 0.0, new Rotation2d()));
+        m_odometry = new SwerveDriveOdometry(
+        m_kinematics, gyro.getRotation2d(),
+        driveSub.getPositions(),
+        new Pose2d(0.0, 0.0, new Rotation2d()));
 
         m_poseEstimator = new SwerveDrivePoseEstimator(
                 m_kinematics,
@@ -160,7 +160,7 @@ public class OdometrySubsystem extends SubsystemBase {
     public double[] getSwerveAngles() {
         double[] pos = new double[4];
         for (int i = 0; i < 4; i++) {
-            pos[i] = modules[i].canCoderPositionAdjusted();
+            pos[i] = modules[i].canCoderPositionAdjustedForOdometry();
         }
         return pos;
     }

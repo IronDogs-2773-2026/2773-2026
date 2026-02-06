@@ -5,12 +5,14 @@
 package frc.robot.Information;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonTargetSortMode;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
@@ -35,7 +37,7 @@ import frc.robot.Information.VisionSubsystem.EstimateConsumer;
 public class PhotonSubsystem extends SubsystemBase {
   /** Creates a new PhotonSubsystem. */
 
-  private Matrix<N3, N1> curStdDevs;
+  private Matrix<N3, N1> curStdDevs = Constants.SingleTagStdDevs;
   private final PhotonPoseEstimator m_photonEstimator;
 
   // create a photon camera object
@@ -76,7 +78,7 @@ public class PhotonSubsystem extends SubsystemBase {
         if (numTags > 1)
           estStdDevs = Constants.SingleTagStdDevs;
         if (numTags == 1 && avgDist > 4)
-          estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+          estStdDevs = VecBuilder.fill(Constants.BigNumber, Constants.BigNumber, Constants.BigNumber);
         else {
           estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
         }
@@ -108,6 +110,13 @@ public class PhotonSubsystem extends SubsystemBase {
 
   // returns pose estimate as a pose2d s
   public Pose2d getPose2d() {
-    return estimates.get().estimatedPose.toPose2d();
+    Pose2d estimate;
+    try {
+      estimate = estimates.get().estimatedPose.toPose2d();
+    }
+    catch (NoSuchElementException e) {
+      estimate = new Pose2d();
+    }
+    return estimate;
   }
 }

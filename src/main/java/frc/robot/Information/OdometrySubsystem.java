@@ -97,8 +97,8 @@ public class OdometrySubsystem extends SubsystemBase {
                 gyroAngle.times(-1),
                 driveSub.getPositions());
 
-        Pose2d photonPose = photonSub.getPose2d() != null ? photonSub.getPose2d() : new Pose2d();
-        if (photonPose != new Pose2d()) {
+        Pose2d photonPose = photonSub.getPose2d();
+        if (photonPose != null) {
             m_poseEstimator.addVisionMeasurement(
                     photonPose,
                     Timer.getFPGATimestamp(),

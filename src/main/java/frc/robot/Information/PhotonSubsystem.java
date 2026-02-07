@@ -45,7 +45,8 @@ public class PhotonSubsystem extends SubsystemBase {
   PhotonCamera tagCamera;
   public static final AprilTagFieldLayout kTagLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
-  public static final Transform3d kRobotToCam = new Transform3d(new Translation3d(0.14, 0, 0),
+  // TODO change x component of translation3d to reflect camera position on the robot
+  public static final Transform3d kRobotToCam = new Transform3d(new Translation3d(0.08, 0, 0),
       new Rotation3d(0, Math.PI / 6, 0));
 
   // may be worth moving to deprecated 4 part constructor if still an issue
@@ -156,8 +157,6 @@ public class PhotonSubsystem extends SubsystemBase {
         ? null
         : lastGoodPose.estimatedPose.toPose2d();
   }
-
-  double latestTimestamp = 0;
 
   public double getPhotonTimestamp() {
     return lastTimestamp;

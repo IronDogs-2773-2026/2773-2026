@@ -41,10 +41,10 @@ public class OdometrySubsystem extends SubsystemBase {
     DriveSubsystem driveSub;
 
     // Locations for the swerve drive modules relative to the robot center. Meters?
-    Translation2d m_frontLeftLocation = new Translation2d(0.285, 0.285);
-    Translation2d m_frontRightLocation = new Translation2d(0.285, -0.285);
-    Translation2d m_backLeftLocation = new Translation2d(-0.285, 0.285);
-    Translation2d m_backRightLocation = new Translation2d(-0.285, -0.285);
+    Translation2d m_frontLeftLocation = new Translation2d(0.283, 0.281);
+    Translation2d m_frontRightLocation = new Translation2d(0.283, -0.281);
+    Translation2d m_backLeftLocation = new Translation2d(-0.283, 0.281);
+    Translation2d m_backRightLocation = new Translation2d(-0.283, -0.281);
 
     SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
             m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
@@ -105,8 +105,7 @@ public class OdometrySubsystem extends SubsystemBase {
             m_poseEstimator.addVisionMeasurement(
                     photonPose,
                     photonSub.getPhotonTimestamp(),
-                    photonSub.getStdDevs()
-                );
+                    photonSub.getStdDevs());
         }
 
         pose = m_poseEstimator.getEstimatedPosition();

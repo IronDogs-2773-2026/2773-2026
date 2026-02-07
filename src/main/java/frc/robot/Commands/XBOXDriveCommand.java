@@ -16,7 +16,6 @@ import frc.robot.Constants;
 public class XBOXDriveCommand extends Command {
   private final DriveSubsystem driveSubsystem;
   private final XboxController xbox;
-  private final TagSubsystem tagSub;
   private final OdometrySubsystem odomSub;
   private PIDController pid;
   private PIDController rotPID;
@@ -28,12 +27,12 @@ public class XBOXDriveCommand extends Command {
   private double ry = 0.5;
 
   /** Creates a new DriveCommand. */
-  public XBOXDriveCommand(DriveSubsystem driveSub, XboxController xbox, TagSubsystem tagSub, OdometrySubsystem odomSub) {
+  public XBOXDriveCommand(DriveSubsystem driveSub, XboxController xbox, OdometrySubsystem odomSub) {
     this.driveSubsystem = driveSub;
     this.xbox = xbox;
-    this.tagSub = tagSub;
     this.odomSub = odomSub;
     this.pid = driveSub.getPID();
+    this.rotPID = new PIDController(rx, 0, 0);
     addRequirements(driveSub);
   }
   
@@ -92,11 +91,11 @@ public class XBOXDriveCommand extends Command {
     }
   }
 
-  public Boolean buttonPressed(int i) {
+  public boolean buttonPressed(int i) {
     return xbox.getRawButton(i);
   }
 
-  public Boolean buttonOnPress(int i) {
+  public boolean buttonOnPress(int i) {
     return xbox.getRawButtonPressed(i);
   }
 
@@ -105,7 +104,8 @@ public class XBOXDriveCommand extends Command {
     double dy = ry - odomSub.getY();
     double angle = Math.atan2(dy, dx);
     rotPID.setSetpoint(angle);
-    return rotPID.calculate(odomSub.getGyroAngle());
+    double error = MathUtil.angleModulus(angle - odomSub.getGyroAngle());
+    return rotPID.calculate(error);
   }
 
   // Called once the command ends or is interrupted.

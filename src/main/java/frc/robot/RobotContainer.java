@@ -22,10 +22,9 @@ public class RobotContainer {
   DriveSubsystem driveSub = new DriveSubsystem();
   PhotonSubsystem photonSub = new PhotonSubsystem();
   OdometrySubsystem odomSub = new OdometrySubsystem(driveSub, photonSub);
-  TagSubsystem tagSub = new TagSubsystem(odomSub);
 
   // Commands from files
-  XBOXDriveCommand driveCommand = new XBOXDriveCommand(driveSub, xbox, tagSub, odomSub);
+  XBOXDriveCommand driveCommand = new XBOXDriveCommand(driveSub, xbox, odomSub);
 
   // Command scheduler
   {

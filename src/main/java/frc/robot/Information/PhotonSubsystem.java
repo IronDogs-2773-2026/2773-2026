@@ -128,12 +128,12 @@ public class PhotonSubsystem extends SubsystemBase {
     }
     poseEstimatorPose = m_photonEstimator.estimateLowestAmbiguityPose(res);
 
-    System.out.println("Camera connected: " + tagCamera.isConnected());
-    System.out.println("Targets: " + res.getTargets().size());
-    if (poseEstimatorPose.isPresent()) {
-      System.out.println("Vision pose: " +
-          poseEstimatorPose.get().estimatedPose.toPose2d());
-    }
+    // System.out.println("Camera connected: " + tagCamera.isConnected());
+    // System.out.println("Targets: " + res.getTargets().size());
+    // if (poseEstimatorPose.isPresent()) {
+    //   System.out.println("Vision pose: " +
+    //       poseEstimatorPose.get().estimatedPose.toPose2d());
+    // }
 
     if (poseEstimatorPose.isPresent()) {
       lastGoodPose = poseEstimatorPose.get();

@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.SwerveSubsystems.*;
 import frc.robot.Commands.*;
@@ -17,6 +18,7 @@ public class RobotContainer {
   // Base inits
   // Controllers
   XboxController xbox = new XboxController(2);
+  Joystick joystick = new Joystick(0);
 
   // Subsystems
   DriveSubsystem driveSub = new DriveSubsystem();
@@ -25,11 +27,12 @@ public class RobotContainer {
 
   // Commands from files
   XBOXDriveCommand driveCommand = new XBOXDriveCommand(driveSub, xbox, odomSub);
+  JoystickDriveCommand jdriveCommand = new JoystickDriveCommand(driveSub, joystick, odomSub);
 
   // Command scheduler
   {
     driveSub.setDefaultCommand(driveCommand);
-
+    
   }
 
   // Autonomous chooser

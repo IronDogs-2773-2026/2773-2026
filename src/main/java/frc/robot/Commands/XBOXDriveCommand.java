@@ -21,7 +21,7 @@ public class XBOXDriveCommand extends Command {
   private PIDController rotPID;
   double sensitivity = 0.5;
 
-  //For setpoint
+  // For setpoint
   private boolean Rsetpoint = false;
   private double rx = 0;
   private double ry = 0.5;
@@ -32,10 +32,10 @@ public class XBOXDriveCommand extends Command {
     this.xbox = xbox;
     this.odomSub = odomSub;
     this.pid = driveSub.getPID();
-    this.rotPID = new PIDController(rx, 0, 0);
+    this.rotPID = new PIDController(0.2, 0, 0);
     addRequirements(driveSub);
   }
-  
+
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
@@ -46,6 +46,7 @@ public class XBOXDriveCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   double oldT = 0.0;
   double oldG = 0.0;
+
   @Override
   public void execute() {
     buttonMicroCommands();
@@ -57,19 +58,26 @@ public class XBOXDriveCommand extends Command {
     } else if (xbox.getPOV() == 180) {
       sensitivity = MathUtil.clamp(-0.05 + sensitivity, 0, 1);
     }
-    double setDistance = MathUtil.clamp(Math.sqrt(XAxis * XAxis + YAxis * YAxis)*2, 0,2);
+    double setDistance = MathUtil.clamp(Math.sqrt(XAxis * XAxis + YAxis * YAxis) * 2, 0, 2);
     double rotSpeed;
+
     if (!Rsetpoint) {
-      rotSpeed = (MathUtil.applyDeadband(ZAxis, Constants.ControllerDeadzone)) * sensitivity * Constants.MaxRotationSpeed;
+      rotSpeed = (MathUtil.applyDeadband(ZAxis, Constants.ControllerDeadzone)) * sensitivity
+          * Constants.MaxRotationSpeed;
     } else {
       rotSpeed = rotateAroundPoint(rx, ry);
     }
-          
+
     pid.setSetpoint(setDistance);
-    double driveSpeed = pid.calculate((driveSubsystem.averageDistanceEncoder()-oldT)*11.24) * Constants.MaxDriveSpeed * sensitivity;
+    double driveSpeed = pid.calculate((driveSubsystem.averageDistanceEncoder() - oldT) * 11.24)
+        * Constants.MaxDriveSpeed * sensitivity;
 
+    if (xbox.getPOV() != -1) {
+      rotSpeed = povRotate();
+    }
 
-    if (Math.abs(XAxis) < Constants.ControllerDeadzone && Math.abs(YAxis) < Constants.ControllerDeadzone && Math.abs(ZAxis) < Constants.ControllerDeadzone) {
+    if (xbox.getPOV() == -1 && Math.abs(XAxis) < Constants.ControllerDeadzone && Math.abs(YAxis) < Constants.ControllerDeadzone
+        && Math.abs(ZAxis) < Constants.ControllerDeadzone) {
       driveSubsystem.stop();
     } else {
       if (Math.abs(ZAxis) > 0) {
@@ -87,9 +95,30 @@ public class XBOXDriveCommand extends Command {
       System.out.println("Gyro Reset Manually");
     }
     if (buttonPressed(1)) {
-      Rsetpoint = (Rsetpoint==true) ? false : true;
+      Rsetpoint = (Rsetpoint == true) ? false : true;
     }
   }
+
+public double povRotate() {
+    int pov = xbox.getPOV();
+    if (pov == -1) {
+        return 0; // no POV pressed
+    }
+
+    // Convert gyro radians → degrees
+    double currentDeg = Math.toDegrees(odomSub.getGyroAngle());
+    currentDeg = MathUtil.inputModulus(currentDeg, 0, 360);
+
+    double targetDeg = pov; // POV already gives 0, 90, 180, 270
+
+    rotPID.enableContinuousInput(0, 360);
+
+    double output = rotPID.calculate(currentDeg, targetDeg);
+
+    // Clamp rotation so it doesn't go crazy
+    return MathUtil.clamp(output, -0.6, 0.6);
+}
+
 
   public boolean buttonPressed(int i) {
     return xbox.getRawButton(i);

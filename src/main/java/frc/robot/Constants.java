@@ -47,7 +47,7 @@ public class Constants {
   public static final double MaxTowerSpeed = 0.25;
   public static final double MaxAutoDriveSpeed = 0.3;
 
-  public static final double ControllerDeadzone = 0.05;
+  public static final double ControllerDeadzone = 0.07;
   public static final double HOTASDeadzone = 0.1;
   public static final double HOTASRotationDeadzone = 0.3;
 

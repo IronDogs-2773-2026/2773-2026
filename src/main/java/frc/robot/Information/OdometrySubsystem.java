@@ -90,7 +90,7 @@ public class OdometrySubsystem extends SubsystemBase {
     // StructArrayPublisher<SwerveModuleState> publisher =
     // NetworkTableInstance.getDefault()
     // .getStructArrayTopic("MyStates", SwerveModuleState.struct).publish();
-    double[] debugStdDevs = {0.05, 0.05, 0.02};
+
     @Override
     public void periodic() {
         Rotation2d gyroAngle = new Rotation2d(gyro.getAngle() * Math.PI / 180); // potentially move declaration outside
@@ -105,8 +105,7 @@ public class OdometrySubsystem extends SubsystemBase {
             m_poseEstimator.addVisionMeasurement(
                     photonPose,
                     photonSub.getPhotonTimestamp(),
-                    // photonSub.getStdDevs()
-                    debugStdDevs
+                    photonSub.getStdDevs()
                 );
         }
 

@@ -122,6 +122,9 @@ public class PhotonSubsystem extends SubsystemBase {
       return;
     }
     PhotonPipelineResult res = results.get(results.size() - 1);
+    if (res.getTargets().size() > 0) {
+      return;
+    }
     poseEstimatorPose = m_photonEstimator.estimateLowestAmbiguityPose(res);
 
     System.out.println("Camera connected: " + tagCamera.isConnected());

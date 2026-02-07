@@ -66,7 +66,7 @@ public class SwerveDriveModule {
   
   public void directionalDrive(double speed, double angle) {
     pidRotate.setSetpoint(0);
-    // TODO Change canCoderPositionAdjusted, it bad use 
+    // this is likely dangerous, revert to canCoderPositionAdjusted() if there are issues
     double pos = canCoderPositionAdjusted() - angle;
 
     // -PI =< pos < PI

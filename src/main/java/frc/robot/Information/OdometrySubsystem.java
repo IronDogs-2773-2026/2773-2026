@@ -20,6 +20,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.*;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.util.sendable.Sendable;
@@ -30,6 +31,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.SwerveSubsystems.DriveSubsystem;
 import frc.robot.SwerveSubsystems.SwerveDriveModule;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.wpilibj.Timer;
@@ -60,9 +62,9 @@ public class OdometrySubsystem extends SubsystemBase {
         this.photonSub = photonSub;
         modules = driveSub.modules;
         m_odometry = new SwerveDriveOdometry(
-        m_kinematics, gyro.getRotation2d(),
-        driveSub.getPositions(),
-        new Pose2d(0.0, 0.0, new Rotation2d()));
+                m_kinematics, gyro.getRotation2d(),
+                driveSub.getPositions(),
+                new Pose2d(0.0, 0.0, new Rotation2d()));
 
         m_poseEstimator = new SwerveDrivePoseEstimator(
                 m_kinematics,
@@ -88,6 +90,7 @@ public class OdometrySubsystem extends SubsystemBase {
     // StructArrayPublisher<SwerveModuleState> publisher =
     // NetworkTableInstance.getDefault()
     // .getStructArrayTopic("MyStates", SwerveModuleState.struct).publish();
+    double[] debugStdDevs = {0.05, 0.05, 0.02};
     @Override
     public void periodic() {
         Rotation2d gyroAngle = new Rotation2d(gyro.getAngle() * Math.PI / 180); // potentially move declaration outside
@@ -98,11 +101,13 @@ public class OdometrySubsystem extends SubsystemBase {
                 driveSub.getPositions());
 
         Pose2d photonPose = photonSub.getPose2d();
-        if (photonPose != null) {
+        if (photonPose != null && Timer.getFPGATimestamp() - photonSub.getPhotonTimestamp() < 3) {
             m_poseEstimator.addVisionMeasurement(
                     photonPose,
-                    Timer.getFPGATimestamp(),
-                    photonSub.getStdDevs());
+                    photonSub.getPhotonTimestamp(),
+                    // photonSub.getStdDevs()
+                    debugStdDevs
+                );
         }
 
         pose = m_poseEstimator.getEstimatedPosition();
@@ -133,6 +138,11 @@ public class OdometrySubsystem extends SubsystemBase {
 
     public void resetPose(Pose2d newPose) {
         pose = newPose;
+        m_poseEstimator.resetPosition(
+                gyro.getRotation2d().times(-1), // current gyro heading
+                driveSub.getPositions(), // current module positions
+                newPose // new pose
+        );
     }
 
     // public ChassisSpeeds getChassisSpeeds() {
@@ -148,9 +158,15 @@ public class OdometrySubsystem extends SubsystemBase {
     }
 
     public void setPose(double x, double y, double rotation) {
-        pose = new Pose2d(x, y, new Rotation2d(rotation));
-        // System.out.println("X: " + x + " Y: " + y);
-        m_odometry.resetPose(pose);
+        Pose2d newPose = new Pose2d(x, y, new Rotation2d(rotation));
+        pose = newPose;
+
+        // Reset both odometry and estimator
+        m_odometry.resetPose(newPose);
+        m_poseEstimator.resetPosition(
+                gyro.getRotation2d().times(-1),
+                driveSub.getPositions(),
+                newPose);
     }
 
     public void resetGyro() {

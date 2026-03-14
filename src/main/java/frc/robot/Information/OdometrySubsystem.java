@@ -99,6 +99,7 @@ public class OdometrySubsystem extends SubsystemBase {
         field.setRobotPose(pose);
         SmartDashboard.putNumber("X", pose.getX());
         SmartDashboard.putNumber("Y", pose.getY());
+        SmartDashboard.putData("Field", field);
     }
 
     /*

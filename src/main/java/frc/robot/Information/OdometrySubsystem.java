@@ -87,8 +87,8 @@ public class OdometrySubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        Rotation2d gyroAngle = new Rotation2d(gyro.getAngle() * Math.PI / 180); // potentially move declaration outside
-                                                                                // of loop
+        Rotation2d gyroAngle = new Rotation2d(gyro.getAngle() * Math.PI / 180);
+        
         m_poseEstimator.updateWithTime(
                 Timer.getFPGATimestamp(),
                 gyroAngle.times(-1),

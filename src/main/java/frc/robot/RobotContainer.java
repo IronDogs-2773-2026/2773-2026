@@ -26,9 +26,8 @@ public class RobotContainer {
 
   // Subsystems
   DriveSubsystem driveSub = new DriveSubsystem();
-  PhotonSubsystem photonSub;// = new PhotonSubsystem();
+  OdometrySubsystem odomSub = new OdometrySubsystem(driveSub);
   VisionSubsystem visionSub = new VisionSubsystem(this::acceptEstimatedRobotPose);
-  OdometrySubsystem odomSub = new OdometrySubsystem(driveSub, photonSub);
 
   // Commands from files
   XBOXDriveCommand driveCommand = new XBOXDriveCommand(driveSub, xbox, odomSub);
@@ -41,7 +40,7 @@ public class RobotContainer {
   }
 
   void acceptEstimatedRobotPose(Pose2d pose, double timestamp, Matrix<N3, N1> estimationStdDevs) {
-    System.out.println(pose);
+    odomSub.addVisionMeasurement(pose, timestamp, estimationStdDevs);
   }
   // Autonomous chooser
 

@@ -1,8 +1,5 @@
 package frc.robot.Information;
 
-import java.lang.System.Logger;
-import java.lang.reflect.Field;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
@@ -11,7 +8,6 @@ import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
 
 import frc.robot.Constants;
-import frc.robot.Information.PhotonSubsystem;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -55,12 +51,9 @@ public class OdometrySubsystem extends SubsystemBase {
     SwerveDriveModule[] modules;
     Pose2d pose = new Pose2d();
     Field2d field = new Field2d();
-    // PhotonSubsystem photonSub;
-
-    public OdometrySubsystem(DriveSubsystem driveSub, PhotonSubsystem photonSub) {
+    public OdometrySubsystem(DriveSubsystem driveSub) {
         gyro.reset();
         this.driveSub = driveSub;
-        // this.photonSub = photonSub;
         modules = driveSub.modules;
         m_odometry = new SwerveDriveOdometry(
                 m_kinematics, gyro.getRotation2d(),
@@ -100,14 +93,6 @@ public class OdometrySubsystem extends SubsystemBase {
                 Timer.getFPGATimestamp(),
                 gyroAngle.times(-1),
                 driveSub.getPositions());
-
-        // Pose2d photonPose = photonSub.getPose2d();
-        // if (photonPose != null && Timer.getFPGATimestamp() - photonSub.getPhotonTimestamp() < Constants.TimeAllowance) {
-        //     m_poseEstimator.addVisionMeasurement(
-        //             photonPose,
-        //             photonSub.getPhotonTimestamp(),
-        //             photonSub.getStdDevs());
-        // }
 
         pose = m_poseEstimator.getEstimatedPosition();
 
@@ -166,6 +151,10 @@ public class OdometrySubsystem extends SubsystemBase {
                 gyro.getRotation2d().times(-1),
                 driveSub.getPositions(),
                 newPose);
+    }
+
+    public void addVisionMeasurement(Pose2d pose, double timestamp, Matrix<N3, N1> stdDevs) {
+        m_poseEstimator.addVisionMeasurement(pose, timestamp, stdDevs);
     }
 
     public void resetGyro() {

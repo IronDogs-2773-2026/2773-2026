@@ -26,6 +26,9 @@ public class XBOXDriveCommand extends Command {
   private double rx = 0;
   private double ry = 0.5;
 
+  // Drive heading offset — set when driver presses 7+8, does not affect odometry/vision
+  private double driveHeadingOffset = 0;
+
   /** Creates a new DriveCommand. */
   public XBOXDriveCommand(DriveSubsystem driveSub, XboxController xbox, OdometrySubsystem odomSub) {
     this.driveSubsystem = driveSub;
@@ -39,8 +42,7 @@ public class XBOXDriveCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    odomSub.getGyroAngle();
-    odomSub.resetGyro();
+    driveHeadingOffset = odomSub.getGyroAngle();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -52,7 +54,7 @@ public class XBOXDriveCommand extends Command {
     buttonMicroCommands();
     double XAxis = xbox.getLeftX(), YAxis = xbox.getLeftY(), ZAxis = xbox.getRightX();
     double rawAngle = Math.atan2(YAxis, XAxis);
-    double gyroAngle = odomSub.getGyroAngle();
+    double gyroAngle = odomSub.getGyroAngle() - driveHeadingOffset;
     if (xbox.getPOV() == 0) {
       sensitivity = MathUtil.clamp(0.05 + sensitivity, 0, 1);
     } else if (xbox.getPOV() == 180) {
@@ -91,7 +93,7 @@ public class XBOXDriveCommand extends Command {
 
   public void buttonMicroCommands() {
     if (buttonPressed(7) && buttonOnPress(8)) {
-      odomSub.resetGyro();
+      driveHeadingOffset = odomSub.getGyroAngle();
       System.out.println("Gyro Reset Manually");
     }
     if (buttonPressed(1)) {

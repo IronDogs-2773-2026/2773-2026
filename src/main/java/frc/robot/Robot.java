@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.ctre.phoenix6.unmanaged.Unmanaged;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -30,6 +31,7 @@ public class Robot extends TimedRobot {
    * initialization code.
    */
   public Robot() {
+    Unmanaged.setPhoenixDiagnosticsStartTime(-1);
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_chooser.setDefaultOption("Auto 1", "Auto 1");

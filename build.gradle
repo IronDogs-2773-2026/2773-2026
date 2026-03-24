@@ -36,6 +36,13 @@ deploy {
                     deleteOldFiles = false // Change to true to delete files on roboRIO that no
                                            // longer exist in deploy directory of this project
                 }
+
+                // PathPlanner paths - deploy to correct location for AutoBuilder
+                frcStaticFileDeploy(getArtifactTypeClass('FileTreeArtifact')) {
+                    files = project.fileTree('src/main/deploy/pathplanner/paths')
+                    directory = '/home/lvuser/pathplanner/paths'
+                    deleteOldFiles = false
+                }
             }
         }
     }

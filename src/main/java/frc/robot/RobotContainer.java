@@ -48,6 +48,9 @@ public class RobotContainer {
       System.err.println("ERROR: AutoBuilder.buildAutoChooser() returned null!");
       autoChooser = new SendableChooser<>();
       autoChooser.setDefaultOption("No Auto Available", null);
+    } else {
+      System.out.println("RobotContainer: AutoChooser built successfully");
+      System.out.println("RobotContainer: AutoChooser is ready");
     }
     
     System.out.println("RobotContainer: Putting Auto Chooser on SmartDashboard...");

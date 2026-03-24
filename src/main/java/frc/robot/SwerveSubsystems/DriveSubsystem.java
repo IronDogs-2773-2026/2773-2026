@@ -238,7 +238,11 @@ public class DriveSubsystem extends SubsystemBase {
    * Call this after OdometrySubsystem is created
    */
   public void initAutoBuilder(OdometrySubsystem odomSub) {
+    System.out.println("DriveSubsystem: Starting AutoBuilder initialization...");
+    
     try {
+      System.out.println("DriveSubsystem: Creating RobotConfig...");
+      
       // Create RobotConfig inline (more reliable than fromGUISettings)
       // PathPlannerLib 2026 API - module locations in FL, FR, BL, BR order
       RobotConfig config = new RobotConfig(
@@ -257,6 +261,8 @@ public class DriveSubsystem extends SubsystemBase {
         new Translation2d(-0.283, 0.281),   // Back Left
         new Translation2d(-0.283, -0.281)   // Back Right
       );
+
+      System.out.println("DriveSubsystem: RobotConfig created, configuring AutoBuilder...");
 
       // Configure AutoBuilder
       AutoBuilder.configure(
@@ -277,7 +283,7 @@ public class DriveSubsystem extends SubsystemBase {
         this                                   // Reference to this subsystem
       );
       
-      System.out.println("AutoBuilder configured successfully!");
+      System.out.println("DriveSubsystem: AutoBuilder configured successfully!");
     } catch (Exception e) {
       String errorMsg = "AutoBuilder init failed: " + e.getMessage();
       DriverStation.reportError(errorMsg, true);

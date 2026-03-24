@@ -20,7 +20,7 @@ import frc.robot.Information.*;
 
 public class RobotContainer {
   // Autonomous chooser
-  private final SendableChooser<Command> autoChooser;
+  private SendableChooser<Command> autoChooser;
 
   // Controllers
   XboxController xbox = new XboxController(0);
@@ -37,14 +37,24 @@ public class RobotContainer {
 
   public RobotContainer() {
     System.out.println("RobotContainer: Initializing AutoBuilder...");
-    
+
     // Initialize AutoBuilder after subsystems are created
     driveSub.initAutoBuilder(odomSub);
-    
+
     System.out.println("RobotContainer: Building auto chooser...");
     autoChooser = AutoBuilder.buildAutoChooser();
+    
+    if (autoChooser == null) {
+      System.err.println("ERROR: AutoBuilder.buildAutoChooser() returned null!");
+      autoChooser = new SendableChooser<>();
+      autoChooser.setDefaultOption("No Auto Available", null);
+    }
+    
+    System.out.println("RobotContainer: Putting Auto Chooser on SmartDashboard...");
+    SmartDashboard.putData("AutoChooser", autoChooser);
     SmartDashboard.putData("Auto Chooser", autoChooser);
-    System.out.println("RobotContainer: Auto chooser created!");
+    System.out.println("RobotContainer: Auto chooser created and added to SmartDashboard!");
+    System.out.println("RobotContainer: Check SmartDashboard for 'AutoChooser' or 'Auto Chooser'");
 
     // Command scheduler
     driveSub.setDefaultCommand(driveCommand);

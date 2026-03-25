@@ -95,17 +95,19 @@ public class SwerveDriveModule {
 
   public void setDesiredState(SwerveModuleState desiredState) {
     // 1. Optimize the state to prevent spinning more than 90 degrees.
-    // This makes sure that if the wheel needs to go to 180°, it just 
+    // This makes sure that if the wheel needs to go to 180°, it just
     // stays at 0° and reverses the drive motor instead.
+    // Uses canCoderPositionAdjustedForOdometry() to match CCW-positive convention
+    // used by PathPlanner/kinematics (consistent with getSwervePosition())
     SwerveModuleState optimizedState = SwerveModuleState.optimize(
-        desiredState, 
-        Rotation2d.fromRadians(canCoderPositionAdjusted())
+        desiredState,
+        Rotation2d.fromRadians(canCoderPositionAdjustedForOdometry())
     );
 
     // 2. Calculate the rotation output using your PID controller.
     // MathUtil.angleModulus ensures we take the shortest path (no 360-degree spins).
     double rotationError = MathUtil.angleModulus(
-        optimizedState.angle.getRadians() - canCoderPositionAdjusted()
+        optimizedState.angle.getRadians() - canCoderPositionAdjustedForOdometry()
     );
 
     double rotationOutput = pidRotate.calculate(rotationError, 0);
@@ -167,6 +169,7 @@ public class SwerveDriveModule {
 
   public SwerveModuleState getSwerveState() {
     return new SwerveModuleState(
-        distanceEncoder.getVelocity(), new Rotation2d(canCoderPositionAdjusted()));
+        distanceEncoder.getVelocity() / EncoderMagicRevolutionNumber * DriveMotorWheelGearRatio
+            * Constants.WheelCircumference / 60.0, new Rotation2d(canCoderPositionAdjustedForOdometry()));
   }
 }

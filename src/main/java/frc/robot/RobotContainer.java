@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -76,11 +77,12 @@ public class RobotContainer {
     // Command scheduler
     driveSub.setDefaultCommand(driveCommand);
 
-    // A button: run PathPlanner "New Path" while held
+    // A button: pathfind to start of "New Path" then follow it
     try {
       PathPlannerPath newPath = PathPlannerPath.fromPathFile("New Path");
+      PathConstraints constraints = new PathConstraints(1.0, 1.0, Math.PI, Math.PI);
       new JoystickButton(xbox, XboxController.Button.kA.value)
-          .whileTrue(AutoBuilder.followPath(newPath));
+          .whileTrue(AutoBuilder.pathfindThenFollowPath(newPath, constraints));
     } catch (Exception e) {
       System.err.println("FAILED to load 'New Path' for A button: " + e.getMessage());
     }

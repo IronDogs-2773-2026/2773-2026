@@ -75,17 +75,14 @@ public class RobotContainer {
 
     // Command scheduler
     driveSub.setDefaultCommand(driveCommand);
-  }
 
-  {
+    // A button: run PathPlanner "New Path" while held
     try {
       PathPlannerPath newPath = PathPlannerPath.fromPathFile("New Path");
-      System.out.println("RobotContainer: SUCCESS - Added 'New Path' to chooser");
-        new JoystickButton(xbox, XboxController.Button.kA.value)
-        .whileTrue(AutoBuilder.followPath(newPath));
+      new JoystickButton(xbox, XboxController.Button.kA.value)
+          .whileTrue(AutoBuilder.followPath(newPath));
     } catch (Exception e) {
-      System.err.println("FAILED to load 'New Path': " + e.getMessage());
-      e.printStackTrace();
+      System.err.println("FAILED to load 'New Path' for A button: " + e.getMessage());
     }
   }
 

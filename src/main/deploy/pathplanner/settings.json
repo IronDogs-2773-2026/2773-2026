@@ -4,7 +4,7 @@
   "robotTrackwidth": 0.566,
   "driveWheelRadius": 0.0508,
   "driveGearing": 6.75,
-  "maxDriveSpeed": 3.0,
+  "maxDriveSpeed": 0.5,
   "maxDriveAcceleration": 2.5,
   "maxDriveAngularVelocity": 3.0,
   "maxDriveAngularAcceleration": 3.0,

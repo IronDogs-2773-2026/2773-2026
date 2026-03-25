@@ -20,7 +20,6 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 
 public class DriveSubsystem extends SubsystemBase {
@@ -61,7 +60,7 @@ public class DriveSubsystem extends SubsystemBase {
     });
   }
 
-  public SwerveDriveModule[] modules = { flMotor, blMotor, brMotor, frMotor };
+  public SwerveDriveModule[] modules = { flMotor, frMotor, blMotor, brMotor };
 
   @Override
   public void periodic() {
@@ -202,10 +201,10 @@ public class DriveSubsystem extends SubsystemBase {
 
   public SwerveModuleState[] getStates() {
     return new SwerveModuleState[] {
-        modules[0].getSwerveState(),
-        modules[1].getSwerveState(),
-        modules[2].getSwerveState(),
-        modules[3].getSwerveState()
+        flMotor.getSwerveState(),
+        frMotor.getSwerveState(),
+        blMotor.getSwerveState(),
+        brMotor.getSwerveState()
     };
   }
 
@@ -250,16 +249,16 @@ public class DriveSubsystem extends SubsystemBase {
         6.0,            // MOI: 6.0 kg·m²
         new com.pathplanner.lib.config.ModuleConfig(
           0.0508,       // Wheel radius: 0.0508m (from 0.1016m diameter)
-          3.0,          // Max speed: 3.0 m/s
+          0.5,          // Max speed: 0.5 m/s
           1.2,          // Wheel COF: 1.2
           DCMotor.getNEO(1),  // Motor: 1 NEO per module
           6.75,         // Drive gearing: 6.75
           40            // Current limit: 40A
         ),
-        new Translation2d(0.283, 0.281),    // Front Left
-        new Translation2d(0.283, -0.281),   // Front Right
-        new Translation2d(-0.283, 0.281),   // Back Left
-        new Translation2d(-0.283, -0.281)   // Back Right
+        Constants.kfrontLeftLocation,    // Front Left
+        Constants.kfrontRightLocation,   // Front Right
+        Constants.kbackLeftLocation,     // Back Left
+        Constants.kbackRightLocation     // Back Right
       );
 
       System.out.println("DriveSubsystem: RobotConfig created, configuring AutoBuilder...");
@@ -271,8 +270,8 @@ public class DriveSubsystem extends SubsystemBase {
         this::getRobotRelativeSpeeds,        // Robot-relative ChassisSpeeds supplier
         (speeds, feedforwards) -> driveRobotRelative(speeds),  // Robot-relative drive consumer
         new PPHolonomicDriveController(
-          new PIDConstants(5.0, 0.0, 0.0),   // Translation PID
-          new PIDConstants(5.0, 0.0, 0.0)    // Rotation PID
+          new PIDConstants(0.5, 0.0, 0.0),   // Translation PID - lowered from 1.0
+          new PIDConstants(0.5, 0.0, 0.0)    // Rotation PID - lowered from 1.0
         ),
         config,
         () -> {

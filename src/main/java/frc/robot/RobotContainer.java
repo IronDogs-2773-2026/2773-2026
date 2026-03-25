@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.SwerveSubsystems.*;
 import frc.robot.Commands.*;
 import frc.robot.Information.*;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 public class RobotContainer {
   // Autonomous chooser
@@ -43,44 +44,49 @@ public class RobotContainer {
     driveSub.initAutoBuilder(odomSub);
 
     System.out.println("RobotContainer: Building auto chooser...");
-    
-    // Build auto chooser and manually add paths
-    autoChooser = AutoBuilder.buildAutoChooser();
-    
+
+    // Create chooser and set default option
+    autoChooser = new SendableChooser<>();
+    autoChooser.setDefaultOption("None", null);
+
     // Try to load paths manually
     try {
       PathPlannerPath examplePath = PathPlannerPath.fromPathFile("Example Path");
       autoChooser.addOption("Example Path", AutoBuilder.followPath(examplePath));
-      System.out.println("RobotContainer: Added 'Example Path' to chooser");
+      System.out.println("RobotContainer: SUCCESS - Added 'Example Path' to chooser");
     } catch (Exception e) {
-      System.err.println("Failed to load 'Example Path': " + e.getMessage());
+      System.err.println("FAILED to load 'Example Path': " + e.getMessage());
+      e.printStackTrace();
     }
-    
+
     try {
       PathPlannerPath newPath = PathPlannerPath.fromPathFile("New Path");
       autoChooser.addOption("New Path", AutoBuilder.followPath(newPath));
-      System.out.println("RobotContainer: Added 'New Path' to chooser");
+      System.out.println("RobotContainer: SUCCESS - Added 'New Path' to chooser");
     } catch (Exception e) {
-      System.err.println("Failed to load 'New Path': " + e.getMessage());
+      System.err.println("FAILED to load 'New Path': " + e.getMessage());
+      e.printStackTrace();
     }
-    
-    if (autoChooser == null) {
-      System.err.println("ERROR: AutoBuilder.buildAutoChooser() returned null!");
-      autoChooser = new SendableChooser<>();
-      autoChooser.setDefaultOption("No Auto Available", null);
-    } else {
-      System.out.println("RobotContainer: AutoChooser built successfully");
-      System.out.println("RobotContainer: AutoChooser is ready");
-    }
-    
-    System.out.println("RobotContainer: Putting Auto Chooser on SmartDashboard...");
+
+    System.out.println("RobotContainer: AutoChooser created with options");
+    System.out.println("RobotContainer: Putting AutoChooser on SmartDashboard...");
     SmartDashboard.putData("AutoChooser", autoChooser);
-    SmartDashboard.putData("Auto Chooser", autoChooser);
-    System.out.println("RobotContainer: Auto chooser created and added to SmartDashboard!");
-    System.out.println("RobotContainer: Check SmartDashboard for 'AutoChooser' or 'Auto Chooser'");
+    System.out.println("RobotContainer: Done! Check SmartDashboard for 'AutoChooser'");
 
     // Command scheduler
     driveSub.setDefaultCommand(driveCommand);
+  }
+
+  {
+    try {
+      PathPlannerPath newPath = PathPlannerPath.fromPathFile("New Path");
+      System.out.println("RobotContainer: SUCCESS - Added 'New Path' to chooser");
+        new JoystickButton(xbox, XboxController.Button.kA.value)
+        .whileTrue(AutoBuilder.followPath(newPath));
+    } catch (Exception e) {
+      System.err.println("FAILED to load 'New Path': " + e.getMessage());
+      e.printStackTrace();
+    }
   }
 
   void acceptEstimatedRobotPose(Pose2d pose, double timestamp, Matrix<N3, N1> estimationStdDevs) {

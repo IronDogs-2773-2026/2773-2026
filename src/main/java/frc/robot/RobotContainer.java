@@ -84,6 +84,10 @@ public class RobotContainer {
     } catch (Exception e) {
       System.err.println("FAILED to load 'New Path' for A button: " + e.getMessage());
     }
+
+    // B button: drive 1 meter forward (field-relative)
+    new JoystickButton(xbox, XboxController.Button.kB.value)
+        .whileTrue(new DriveDistanceCommand(driveSub, odomSub, -1.0, 0.0, 0.3));
   }
 
   void acceptEstimatedRobotPose(Pose2d pose, double timestamp, Matrix<N3, N1> estimationStdDevs) {

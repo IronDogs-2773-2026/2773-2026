@@ -162,7 +162,7 @@ public class SwerveDriveModule {
 
   public SwerveModulePosition getSwervePosition() {
     return new SwerveModulePosition(
-        distanceEncoderPosition(), new Rotation2d(canCoderPositionAdjustedForOdometry()));
+        distanceEncoderPosition(), new Rotation2d(canCoderPositionAdjusted()));
   }
 
   public SwerveModuleState getSwerveState() {

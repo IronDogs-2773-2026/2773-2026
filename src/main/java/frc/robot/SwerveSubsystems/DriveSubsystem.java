@@ -268,7 +268,14 @@ public class DriveSubsystem extends SubsystemBase {
         odomSub::getPose,                    // Pose supplier
         odomSub::resetPose,                  // Pose consumer (reset odometry)
         this::getRobotRelativeSpeeds,        // Robot-relative ChassisSpeeds supplier
-        (speeds, feedforwards) -> driveRobotRelative(speeds),  // Robot-relative drive consumer
+        (speeds, feedforwards) -> {
+          // PathPlanner outputs field-relative speeds, convert to robot-relative
+          ChassisSpeeds robotRelative = ChassisSpeeds.fromFieldRelativeSpeeds(
+            speeds,
+            odomSub.getPose().getRotation()
+          );
+          driveRobotRelative(robotRelative);
+        },  // Robot-relative drive consumer
         new PPHolonomicDriveController(
           new PIDConstants(0.5, 0.0, 0.0),   // Translation PID - lowered from 1.0
           new PIDConstants(0.5, 0.0, 0.0)    // Rotation PID - lowered from 1.0

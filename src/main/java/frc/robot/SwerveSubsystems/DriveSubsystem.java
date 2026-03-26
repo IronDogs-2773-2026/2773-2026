@@ -3,13 +3,11 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot.SwerveSubsystems;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Information.OdometrySubsystem;
@@ -31,7 +29,6 @@ public class DriveSubsystem extends SubsystemBase {
       Constants.frontRightModuleRotateCANID, Constants.frontRightModuleEncoderCANID, -0.48657);
   public SwerveDriveModule flMotor = new SwerveDriveModule(Constants.frontLeftModuleDriveCANID,
       Constants.frontLeftModuleRotateCANID, Constants.frontLeftModuleEncoderCANID, 0.35522);
-  public double setAngle;
   public double p = 0.63;
   public double i = 0;
   public double d = 0;
@@ -47,17 +44,7 @@ public class DriveSubsystem extends SubsystemBase {
     };
   }
 
-  // PIDController flPID = new PIDController(0.63, 0, 0);
-  // PIDController frPID = new PIDController(0.63, 0, 0);
-  // PIDController blPID = new PIDController(0.63, 0, 0);
-  // PIDController brPID = new PIDController(0.63, 0, 0);
-  // boolean initDone = false;
-
-  /** Creates a new TestSubsystem. */
   public DriveSubsystem() {
-    Shuffleboard.getTab("Navigation").addDoubleArray("Set Angle gilcswdicqewe", () -> {
-      return new double[] { setAngle };
-    });
   }
 
   public SwerveDriveModule[] modules = { flMotor, frMotor, blMotor, brMotor };
@@ -119,13 +106,6 @@ public class DriveSubsystem extends SubsystemBase {
     flMotor.directionalDrive(fl.r, fl.phi);
   }
 
-  public void resetMotors() {
-    blMotor.reset();
-    brMotor.reset();
-    frMotor.reset();
-    flMotor.reset();
-  }
-
   public void stop() {
     blMotor.stop();
     brMotor.stop();
@@ -171,20 +151,6 @@ public class DriveSubsystem extends SubsystemBase {
     flMotor.directionalDrive(kl * speed, flAngle);
   }
 
-  public void setPID(double p, double i, double d) {
-    this.p = p;
-    this.i = i;
-    this.d = d;
-    flMotor.setPIDValues(p, i, d);
-    frMotor.setPIDValues(p, i, d);
-    blMotor.setPIDValues(p, i, d);
-    brMotor.setPIDValues(p, i, d);
-  }
-
-  public double getP() {
-    return p;
-  }
-
   public PIDController getPID() {
     return pid;
   }
@@ -192,11 +158,6 @@ public class DriveSubsystem extends SubsystemBase {
   public double averageDistanceEncoder() {
     return (flMotor.distanceEncoderPosition() + frMotor.distanceEncoderPosition() + blMotor.distanceEncoderPosition()
         + brMotor.distanceEncoderPosition()) / 4;
-  }
-
-  public void increasePBy(double e) {
-    pid.setP(pid.getP() + e);
-    System.out.println("PID set to:" + pid.getP());
   }
 
   public SwerveModuleState[] getStates() {

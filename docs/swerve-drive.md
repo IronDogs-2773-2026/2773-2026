@@ -190,13 +190,13 @@ Returns the cumulative distance the wheel has traveled in meters since the last 
 
 ---
 
-#### `canCoderPositionAdjusted() → double`
+#### `steerAngle() → double`
 
 Returns the current absolute wheel heading in radians, corrected for the module's calibration offset. Used internally by `directionalDrive`.
 
 ---
 
-#### `canCoderPositionAdjustedForOdometry() → double`
+#### `steerAngleWPILib() → double`
 
 Returns the current absolute wheel heading in radians, corrected for the calibration offset **and** the WPILib odometry frame transformation. Used internally by `setDesiredState` and `getSwervePosition`.
 
@@ -391,7 +391,7 @@ Returns the current estimated X or Y position in meters from the pose estimator.
 Teleop input (joystick/xbox)
   └─► DriveSubsystem.directionalDrive(speed, angle, rotation)
         └─► per module: SwerveDriveModule.directionalDrive(speed, angle)
-              ├─ Reads absolute encoder → canCoderPositionAdjusted()
+              ├─ Reads absolute encoder → steerAngle()
               ├─ Computes error, applies optimization (flip if >90°)
               ├─ P-controller → steer motor
               └─ Speed × direction → drive motor

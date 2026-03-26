@@ -63,7 +63,7 @@ public class Constants {
 
   // Vision
   public static final String CameraName = "AprilCam";
-  public static final Transform3d RobotToCam = new Transform3d(new Translation3d(0.14, 0, 0),
+  public static final Transform3d RobotToCam = new Transform3d(new Translation3d(0.01, 0.2, 1),
       new Rotation3d(0, Math.PI/6, Math.PI));
   public static final AprilTagFieldLayout TagLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
   public static final Matrix<N3, N1> SingleTagStdDevs = VecBuilder.fill(0.1, 0.1, Math.toRadians(10));

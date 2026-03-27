@@ -132,7 +132,7 @@ public class SwerveDriveModule {
     // return -value * 2 * Math.PI;
     double angle = -value * 2 * Math.PI;
     // x = -x;
-    angle = -Math.PI / 2 + angle;
+    // angle = -Math.PI / 2 + angle;
     return -angle;
 
   }
@@ -144,7 +144,7 @@ public class SwerveDriveModule {
 
   public SwerveModulePosition getSwervePosition() {
     return new SwerveModulePosition(
-        distanceEncoderPosition(), new Rotation2d(steerAngle()));
+        distanceEncoderPosition(), new Rotation2d(steerAngleWPILib()));
   }
 
   public SwerveModuleState getSwerveState() {

@@ -8,7 +8,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.*;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -34,7 +33,6 @@ public class OdometrySubsystem extends SubsystemBase {
     SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
             m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
     AHRS gyro = new AHRS(NavXComType.kMXP_SPI);
-    SwerveDriveOdometry m_odometry;
     SwerveDrivePoseEstimator m_poseEstimator;
     SwerveDriveModule[] modules;
     Pose2d pose = new Pose2d();
@@ -43,11 +41,6 @@ public class OdometrySubsystem extends SubsystemBase {
         gyro.reset();
         this.driveSub = driveSub;
         modules = driveSub.modules;
-        m_odometry = new SwerveDriveOdometry(
-                m_kinematics, gyro.getRotation2d(),
-                driveSub.getPositions(),
-                new Pose2d(0.0, 0.0, new Rotation2d()));
-
         m_poseEstimator = new SwerveDrivePoseEstimator(
                 m_kinematics,
                 gyro.getRotation2d().times(-1),
@@ -61,8 +54,8 @@ public class OdometrySubsystem extends SubsystemBase {
             return getY();
         });
 
-        SmartDashboard.putNumber("X", pose.getX());
-        SmartDashboard.putNumber("Y", pose.getY());
+        SmartDashboard.putNumber("X", getX());
+        SmartDashboard.putNumber("Y", getY());
     }
 
     @Override
@@ -122,8 +115,6 @@ public class OdometrySubsystem extends SubsystemBase {
         Pose2d newPose = new Pose2d(x, y, new Rotation2d(rotation));
         pose = newPose;
 
-        // Reset both odometry and estimator
-        m_odometry.resetPose(newPose);
         m_poseEstimator.resetPosition(
                 gyro.getRotation2d().times(-1),
                 driveSub.getPositions(),

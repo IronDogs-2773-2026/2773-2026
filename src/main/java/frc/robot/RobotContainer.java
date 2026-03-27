@@ -16,9 +16,11 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.SwerveSubsystems.*;
 import frc.robot.Commands.*;
 import frc.robot.Information.*;
+import frc.ShooterSubsystem;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 public class RobotContainer {
@@ -27,12 +29,13 @@ public class RobotContainer {
 
   // Controllers
   XboxController xbox = new XboxController(0);
-  Joystick joystick = new Joystick(1);
+  XboxController shooterXbox = new XboxController(2);
 
   // Subsystems
   DriveSubsystem driveSub = new DriveSubsystem();
   OdometrySubsystem odomSub = new OdometrySubsystem(driveSub);
   VisionSubsystem visionSub = new VisionSubsystem(this::acceptEstimatedRobotPose);
+  ShooterSubsystem shooterSub = new ShooterSubsystem();
 
   // Commands from files
   XBOXDriveCommand driveCommand = new XBOXDriveCommand(driveSub, xbox, odomSub);
@@ -90,6 +93,28 @@ public class RobotContainer {
     // B button: drive 1 meter forward (field-relative)
     new JoystickButton(xbox, XboxController.Button.kB.value)
         .whileTrue(new DriveDistanceCommand(driveSub, odomSub, -1.0, 0.0, 0.3));
+
+    // Right bumper: one-button shoot sequence (0.6 speed, 0.5 feeder, 1s shoot, 0.5s spinup)
+    new JoystickButton(xbox, XboxController.Button.kRightBumper.value)
+        .whileTrue(new ShootSequenceCommand(shooterSub, 0.6, 0.5, 1.0, 0.5));
+
+    // === SHOOTER CONTROLLER (Xbox port 2) ===
+    // Right bumper: shoot sequence
+    new JoystickButton(shooterXbox, XboxController.Button.kRightBumper.value)
+        .whileTrue(new ShootSequenceCommand(shooterSub, 0.6, 0.5, 1.0, 0.5));
+
+    // Left bumper: manual flywheel control (hold to spin)
+    new JoystickButton(shooterXbox, XboxController.Button.kLeftBumper.value)
+        .whileTrue(new ShooterCommand(shooterSub, 0.5, 0, false));
+
+    // A button: run feeder only (for testing/intake)
+    new JoystickButton(shooterXbox, XboxController.Button.kA.value)
+        .whileTrue(new RunFeederCommand(shooterSub, 0.5));
+
+    // Right stick Y-axis: arm control (default command)
+    shooterSub.setDefaultCommand(
+      new RunCommand(() -> shooterSub.setArmSpeed(-shooterXbox.getRightY()), shooterSub)
+    );
   }
 
   void acceptEstimatedRobotPose(Pose2d pose, double timestamp, Matrix<N3, N1> estimationStdDevs) {

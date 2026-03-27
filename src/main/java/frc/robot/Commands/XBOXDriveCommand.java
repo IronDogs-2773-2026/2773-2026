@@ -16,6 +16,8 @@ import frc.robot.Constants;
 public class XBOXDriveCommand extends Command {
   private final DriveSubsystem driveSubsystem;
   private final XboxController xbox;
+  private final XboxController xbox2;
+
   private final OdometrySubsystem odomSub;
   private PIDController pid;
   private PIDController rotPID;
@@ -33,6 +35,7 @@ public class XBOXDriveCommand extends Command {
   public XBOXDriveCommand(DriveSubsystem driveSub, XboxController xbox, OdometrySubsystem odomSub) {
     this.driveSubsystem = driveSub;
     this.xbox = xbox;
+    this.xbox2 = new XboxController(2);
     this.odomSub = odomSub;
     this.pid = driveSub.getPID();
     this.rotPID = new PIDController(0.2, 0, 0);
@@ -69,6 +72,8 @@ public class XBOXDriveCommand extends Command {
     } else {
       rotSpeed = rotateAroundPoint(rx, ry);
     }
+
+    
 
     pid.setSetpoint(setDistance);
     double driveSpeed = pid.calculate((driveSubsystem.averageDistanceEncoder() - oldT) * 11.24)

@@ -4,13 +4,21 @@
 
 package frc.robot.Commands;
 
+import com.ctre.phoenix6.sim.TalonFXSimState.MotorType;
+import com.revrobotics.spark.SparkMax;
+
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class ShooterCommand extends Command {
+  private SparkMax flywheel1;
+  private SparkMax flywheel2;
   /** Creates a new ShooterCommand. */
   public ShooterCommand() {
     // Use addRequirements() here to declare subsystem dependencies.
+    flywheel1 = new SparkMax(Constants.flyWheel1, Constants.motorType);
+    flywheel2 = new SparkMax(Constants.flyWheel2, Constants.motorType);
   }
 
   // Called when the command is initially scheduled.
@@ -19,7 +27,9 @@ public class ShooterCommand extends Command {
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    
+  }
 
   // Called once the command ends or is interrupted.
   @Override

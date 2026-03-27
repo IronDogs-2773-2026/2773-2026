@@ -26,6 +26,10 @@ public class Constants {
   // MotorType of our Neos & PWMs
   public static final MotorType motorType = MotorType.kBrushless;
 
+  // Shooter Motors
+  public static final int flyWheel1 = 13;
+  public static final int flyWheel2 = 24;
+  public static final int feederMotor = 15;
   // CAN IDs for Swerve Modules
   // Drive Motors
   public static final int frontLeftModuleDriveCANID = 17;

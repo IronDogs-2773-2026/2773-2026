@@ -129,9 +129,7 @@ public class SwerveDriveModule {
       value += 1.0;
     if (value >= 0.5)
       value -= 1.0;
-    // return -value * 2 * Math.PI;
     double angle = -value * 2 * Math.PI;
-    // x = -x;
     // angle = -Math.PI / 2 + angle;
     return -angle;
 

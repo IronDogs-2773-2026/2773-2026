@@ -22,6 +22,7 @@ public class ShooterSubsystem extends SubsystemBase {
   private SparkMax flyWheelTwo = new SparkMax(Constants.flyWheel2, MotorType.kBrushless);
   private SparkMax feederMotor = new SparkMax(Constants.feederMotor, MotorType.kBrushless);
   private SparkMax armMotor = new SparkMax(Constants.armMotor, MotorType.kBrushless);
+  private SparkMax intakeMotor = new SparkMax(Constants.intakeMotor, MotorType.kBrushless);
   
   private PIDController pidController = new PIDController(0.1, 0.0, 0.0);
 
@@ -51,6 +52,7 @@ public class ShooterSubsystem extends SubsystemBase {
     } catch (Exception e) {
       DriverStation.reportWarning("Failed to configure shooter motor current limits", true);
     }
+    stop();
   }
 
   @Override
@@ -97,6 +99,14 @@ public class ShooterSubsystem extends SubsystemBase {
    */
   public void runFeeder(double speed) {
     feederMotor.set(speed);
+  }
+
+  public void runArm(double speed) {
+    armMotor.set(speed);
+  }
+
+  public void runIntake(double speed) {
+    intakeMotor.set(speed);
   }
 
   /**

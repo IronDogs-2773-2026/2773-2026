@@ -29,8 +29,10 @@ public class Constants {
   // Shooter Motors
   public static final int flyWheel1 = 13;
   public static final int flyWheel2 = 24;
-  public static final int feederMotor = 15;
-  public static final int armMotor = 14;
+  public static final int feederMotor = 25;
+  public static final int armMotor = 49;
+  public static final int intakeMotor = 29;
+
   // CAN IDs for Swerve Modules
   // Drive Motors
   public static final int frontLeftModuleDriveCANID = 17;

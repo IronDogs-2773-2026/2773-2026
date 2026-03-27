@@ -100,21 +100,22 @@ public class RobotContainer {
 
     // === SHOOTER CONTROLLER (Xbox port 2) ===
     // Right bumper: shoot sequence
-    new JoystickButton(shooterXbox, XboxController.Button.kRightBumper.value)
-        .whileTrue(new ShootSequenceCommand(shooterSub, 0.6, 0.5, 1.0, 0.5));
+    // new JoystickButton(shooterXbox, XboxController.Button.kRightBumper.value)
+    //     .whileTrue(new ShootSequenceCommand(shooterSub, 0.6, 0.5, 1.0, 0.5));
 
-    // Left bumper: manual flywheel control (hold to spin)
-    new JoystickButton(shooterXbox, XboxController.Button.kLeftBumper.value)
-        .whileTrue(new ShooterCommand(shooterSub, 0.5, 0, false));
+    // // Left bumper: manual flywheel control (hold to spin)
+    // new JoystickButton(shooterXbox, XboxController.Button.kLeftBumper.value)
+    //     .whileTrue(new ShooterCommand(shooterSub, 0.5, 0, false));
 
-    // A button: run feeder only (for testing/intake)
-    new JoystickButton(shooterXbox, XboxController.Button.kA.value)
-        .whileTrue(new RunFeederCommand(shooterSub, 0.5));
+    // // A button: run feeder only (for testing/intake)
+    // new JoystickButton(shooterXbox, XboxController.Button.kA.value)
+    //     .whileTrue(new RunFeederCommand(shooterSub, 0.5));
 
     // Right stick Y-axis: arm control (default command)
-    shooterSub.setDefaultCommand(
-      new RunCommand(() -> shooterSub.setArmSpeed(-shooterXbox.getRightY()), shooterSub)
-    );
+    // shooterSub.setDefaultCommand(
+    //   new RunCommand(() -> shooterSub.setArmSpeed(-shooterXbox.getRightY()), shooterSub)
+    // );
+    shooterSub.setDefaultCommand(new ShooterDefaultCommand(shooterSub, shooterXbox));
   }
 
   void acceptEstimatedRobotPose(Pose2d pose, double timestamp, Matrix<N3, N1> estimationStdDevs) {

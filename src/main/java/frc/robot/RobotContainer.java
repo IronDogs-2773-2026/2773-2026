@@ -20,6 +20,9 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.SwerveSubsystems.*;
 import frc.robot.Commands.*;
 import frc.robot.Information.*;
+import frc.robot.Autonomous.ShootSequence5;
+import frc.robot.Autonomous.ShootSequence10;
+import frc.robot.Autonomous.ShootSequence15;
 import frc.ShooterSubsystem;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
@@ -89,6 +92,18 @@ public class RobotContainer {
     } catch (Exception e) {
       System.err.println("FAILED to load 'New Path' for A button: " + e.getMessage());
     }
+
+    // X button: run "New Auto" autonomous routine
+    try {
+      new JoystickButton(xbox, XboxController.Button.kX.value)
+          .whileTrue(AutoBuilder.buildAuto("New Auto"));
+    } catch (Exception e) {
+      System.err.println("FAILED to load 'New Auto' for X button: " + e.getMessage());
+    }
+
+    NamedCommands.registerCommand("Shoot Sequence 5", new ShootSequence5(shooterSub));
+    NamedCommands.registerCommand("Shoot Sequence 10", new ShootSequence10(shooterSub));
+    NamedCommands.registerCommand("Shoot Sequence 15", new ShootSequence15(shooterSub));
 
     // B button: drive 1 meter forward (field-relative)
     new JoystickButton(xbox, XboxController.Button.kB.value)

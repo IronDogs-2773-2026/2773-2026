@@ -84,28 +84,12 @@ public class SwerveDriveModule {
   }
 
   public void setDesiredState(SwerveModuleState desiredState) {
-    // 1. Optimize the state to prevent spinning more than 90 degrees.
-    // This makes sure that if the wheel needs to go to 180°, it just
-    // stays at 0° and reverses the drive motor instead.
-    SwerveModuleState optimizedState = SwerveModuleState.optimize(
-        desiredState,
-        Rotation2d.fromRadians(steerAngle())
-    );
-
-    // 2. Calculate the rotation output using your PID controller.
-    // MathUtil.angleModulus ensures we take the shortest path (no 360-degree spins).
-    double rotationError = MathUtil.angleModulus(
-        optimizedState.angle.getRadians() - steerAngle()
-    );
-
-    double rotationOutput = pidRotate.calculate(rotationError, 0);
-    rotationOutput = MathUtil.clamp(rotationOutput, -ROTATION_LIMIT_SPEED, ROTATION_LIMIT_SPEED);
-    rotateMotor.set(rotationOutput);
-
-    // 3. Set the drive motor speed.
-    // Convert m/s from the state to a percentage (-1.0 to 1.0) for the SparkMax.
-    double driveOutput = optimizedState.speedMetersPerSecond / Constants.MaxDriveSpeed;
-    driveMotor.set(driveOutput);
+    // WPILib angle convention: 0 = forward, CCW+
+    // Our directionalDrive convention: equilibrium steerAngle() = -angle, so angle = -wpilib_angle
+    // TODO: verify steerAngle() = 0 means physical forward on the robot. If not, a fixed
+    // offset (e.g. -Math.PI/2) must be added: directionalDrive(speed, -angle - Math.PI/2)
+    double speed = desiredState.speedMetersPerSecond / Constants.MaxDriveSpeed;
+    directionalDrive(speed, -desiredState.angle.getRadians());
   }
 
   public double steerAngle() {

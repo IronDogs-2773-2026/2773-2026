@@ -1,0 +1,49 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Robot to Ball"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Feeder Motor"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Collect my Balls"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop Feeder"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Go to Shoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot Sequence 5"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

@@ -84,14 +84,14 @@ public class RobotContainer {
     // Command scheduler
     driveSub.setDefaultCommand(driveCommand);
 
-    // A button: pathfind to start of "New Path" then follow it
+    // A button: pathfind to start of "Red1" then follow it
     try {
-      PathPlannerPath newPath = PathPlannerPath.fromPathFile("New Path");
+      PathPlannerPath newPath = PathPlannerPath.fromPathFile("Red1");
       PathConstraints constraints = new PathConstraints(1.0, 1.0, Math.PI, Math.PI);
       new JoystickButton(xbox, XboxController.Button.kA.value)
           .whileTrue(AutoBuilder.pathfindThenFollowPath(newPath, constraints));
     } catch (Exception e) {
-      System.err.println("FAILED to load 'New Path' for A button: " + e.getMessage());
+      System.err.println("FAILED to load 'Red1' for A button: " + e.getMessage());
     }
 
     // X button: run "New Auto" autonomous routine

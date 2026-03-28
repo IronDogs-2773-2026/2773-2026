@@ -5,7 +5,8 @@
 package frc.robot.Autonomous;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Subsystems.ShooterSubsystem;
+import frc.ShooterSubsystem;
+import frc.robot.Commands.ShootSequenceCommand;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class ShootSequence5 extends Command {

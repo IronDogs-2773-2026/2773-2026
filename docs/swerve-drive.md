@@ -80,26 +80,16 @@ The PID setpoint is always 0 — the error is computed externally and passed as 
 
 The absolute encoder returns normalized rotations in `[0, 1)`, CCW positive. Each module has a calibration offset (`alpha`) to correct for physical mounting angle.
 
-**`steerAngle()` — used for driving:**
+**`steerAngle()` — used everywhere:**
 
 ```
 raw      = encoder.getAbsolutePosition()   // [0, 1) rotations, CCW+
 adjusted = raw − alpha                     // remove mounting offset
 adjusted = wrap(adjusted, −0.5, +0.5)      // normalize to half-rotation
-heading  = −adjusted × 2π                 // to radians; negate for CW+ convention
+heading  = adjusted × 2π                  // to radians, CCW-positive (WPILib convention)
 ```
 
-**`steerAngleWPILib()` — used for odometry and PathPlanner:**
-
-Same normalization, then applies a frame transformation to align with WPILib's CCW-positive robot frame:
-
-```
-angle = −adjusted × 2π
-angle = −π/2 + angle
-return −angle          // = π/2 + adjusted × 2π
-```
-
-Both `getSwervePosition()` and `getSwerveState()` use `steerAngleWPILib()`, ensuring the pose estimator and PathPlanner receive angles in the correct coordinate frame.
+All callers — `directionalDrive`, `setDesiredState`, `getSwervePosition`, `getSwerveState`, and `getSwerveAngles` — use this single method.
 
 ---
 
@@ -154,7 +144,7 @@ Drives the module to a WPILib `SwerveModuleState`. Used by PathPlanner.
 - `state.angle` — desired wheel heading as a `Rotation2d`
 
 **Behavior:**
-1. Calls `SwerveModuleState.optimize()` using `steerAngleWPILib()`.
+1. Calls `SwerveModuleState.optimize()` using `steerAngle()`.
 2. Computes angular error via `MathUtil.angleModulus`.
 3. Applies P-only steering controller, clamped ±0.70.
 4. Converts speed to voltage fraction via `speed / MaxDriveSpeed`.
@@ -178,13 +168,7 @@ Returns cumulative wheel travel in meters since last encoder reset.
 
 #### `steerAngle() → double`
 
-Returns current wheel heading in radians, offset-corrected. Used by `directionalDrive`.
-
----
-
-#### `steerAngleWPILib() → double`
-
-Returns current wheel heading in radians in WPILib's CCW-positive robot frame. Used by `setDesiredState`, `getSwervePosition`, and `getSwerveState`.
+Returns current wheel heading in radians, offset-corrected, CCW-positive (WPILib convention). Used by `directionalDrive`, `setDesiredState`, `getSwervePosition`, and `getSwerveState`.
 
 ---
 
@@ -192,7 +176,7 @@ Returns current wheel heading in radians in WPILib's CCW-positive robot frame. U
 
 Returns module state for the pose estimator:
 - `distanceMeters` — accumulated drive distance
-- `angle` — current heading via `steerAngleWPILib()`
+- `angle` — current heading via `steerAngle()`
 
 ---
 
@@ -200,7 +184,7 @@ Returns module state for the pose estimator:
 
 Returns current module velocity for PathPlanner feedback:
 - `speedMetersPerSecond` — current wheel speed from drive motor velocity
-- `angle` — current heading via `steerAngleWPILib()`
+- `angle` — current heading via `steerAngle()`
 
 ---
 
@@ -375,7 +359,7 @@ Injects an AprilTag pose measurement into the estimator with standard deviations
 
 #### `getSwerveAngles() → double[]`
 
-Returns the current `steerAngleWPILib()` for each of the four modules as a raw array. Order: `[FL, FR, BL, BR]`.
+Returns the current `steerAngle()` for each of the four modules as a raw array. Order: `[FL, FR, BL, BR]`.
 
 ---
 
@@ -393,14 +377,14 @@ Autonomous (PathPlanner)
         ├─ kinematics.toSwerveModuleStates()
         ├─ desaturateWheelSpeeds()
         └─► per module: SwerveDriveModule.setDesiredState(state)
-              ├─ optimize() using steerAngleWPILib()
+              ├─ optimize() using steerAngle()
               ├─ P-controller on angular error → steer motor
               └─ speed / MaxDriveSpeed → drive motor
 
 Odometry (every loop)
   └─► OdometrySubsystem.periodic()
         ├─ NavX gyro angle (negated)
-        ├─ getPositions() → [steerAngleWPILib() + distance] per module
+        ├─ getPositions() → [steerAngle() + distance] per module
         └─► SwerveDrivePoseEstimator.updateWithTime()
               └─ optional: addVisionMeasurement() from AprilTags
 ```

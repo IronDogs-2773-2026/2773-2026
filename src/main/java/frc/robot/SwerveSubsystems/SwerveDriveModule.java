@@ -87,8 +87,6 @@ public class SwerveDriveModule {
     // 1. Optimize the state to prevent spinning more than 90 degrees.
     // This makes sure that if the wheel needs to go to 180°, it just
     // stays at 0° and reverses the drive motor instead.
-    // Uses steerAngle() to match CCW-positive convention
-    // used by PathPlanner/kinematics (consistent with getSwervePosition())
     SwerveModuleState optimizedState = SwerveModuleState.optimize(
         desiredState,
         Rotation2d.fromRadians(steerAngle())
@@ -117,9 +115,7 @@ public class SwerveDriveModule {
       value += 1.0;
     if (value >= 0.5)
       value -= 1.0;
-    double angle = -value * 2 * Math.PI;
-    // angle = -Math.PI / 2 + angle;
-    return -angle;
+    return value * 2 * Math.PI;
   }
 
   public void stop() {

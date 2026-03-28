@@ -67,7 +67,7 @@ public class XBOXDriveCommand extends Command {
     double rotSpeed;
 
     if (!Rsetpoint) {
-      rotSpeed = (MathUtil.applyDeadband(ZAxis, Constants.ControllerDeadzone)) * sensitivity
+      rotSpeed = -(MathUtil.applyDeadband(ZAxis, Constants.ControllerDeadzone)) * sensitivity
           * Constants.MaxRotationSpeed;
     } else {
       rotSpeed = rotateAroundPoint(rx, ry);

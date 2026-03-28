@@ -57,8 +57,7 @@ public class SwerveDriveModule {
   
   public void directionalDrive(double speed, double angle) {
     pidRotate.setSetpoint(0);
-    // this is likely dangerous, revert to steerAngle() if there are issues
-    double pos = steerAngle() - angle;
+    double pos = -steerAngle() - angle;
 
     // -PI =< pos < PI
     while (pos < -Math.PI)
@@ -88,17 +87,17 @@ public class SwerveDriveModule {
     // 1. Optimize the state to prevent spinning more than 90 degrees.
     // This makes sure that if the wheel needs to go to 180°, it just
     // stays at 0° and reverses the drive motor instead.
-    // Uses steerAngleWPILib() to match CCW-positive convention
+    // Uses steerAngle() to match CCW-positive convention
     // used by PathPlanner/kinematics (consistent with getSwervePosition())
     SwerveModuleState optimizedState = SwerveModuleState.optimize(
         desiredState,
-        Rotation2d.fromRadians(steerAngleWPILib())
+        Rotation2d.fromRadians(steerAngle())
     );
 
     // 2. Calculate the rotation output using your PID controller.
     // MathUtil.angleModulus ensures we take the shortest path (no 360-degree spins).
     double rotationError = MathUtil.angleModulus(
-        optimizedState.angle.getRadians() - steerAngleWPILib()
+        optimizedState.angle.getRadians() - steerAngle()
     );
 
     double rotationOutput = pidRotate.calculate(rotationError, 0);
@@ -118,21 +117,9 @@ public class SwerveDriveModule {
       value += 1.0;
     if (value >= 0.5)
       value -= 1.0;
-    return -value * 2 * Math.PI;
-
-  }
-
-  public double steerAngleWPILib() {
-    // position [-0.5..0.5)
-    double value = encoder.getAbsolutePosition().getValueAsDouble() - alpha;
-    if (value < -0.5)
-      value += 1.0;
-    if (value >= 0.5)
-      value -= 1.0;
     double angle = -value * 2 * Math.PI;
     // angle = -Math.PI / 2 + angle;
     return -angle;
-
   }
 
   public void stop() {
@@ -142,12 +129,12 @@ public class SwerveDriveModule {
 
   public SwerveModulePosition getSwervePosition() {
     return new SwerveModulePosition(
-        distanceEncoderPosition(), new Rotation2d(steerAngleWPILib()));
+        distanceEncoderPosition(), new Rotation2d(steerAngle()));
   }
 
   public SwerveModuleState getSwerveState() {
     return new SwerveModuleState(
         distanceEncoder.getVelocity() / EncoderMagicRevolutionNumber * DriveMotorWheelGearRatio
-            * Constants.WheelCircumference / 60.0, new Rotation2d(steerAngleWPILib()));
+            * Constants.WheelCircumference / 60.0, new Rotation2d(steerAngle()));
   }
 }

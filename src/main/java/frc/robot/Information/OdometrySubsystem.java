@@ -137,7 +137,7 @@ public class OdometrySubsystem extends SubsystemBase {
     public double[] getSwerveAngles() {
         double[] pos = new double[4];
         for (int i = 0; i < 4; i++) {
-            pos[i] = modules[i].steerAngleWPILib();
+            pos[i] = modules[i].steerAngle();
         }
         return pos;
     }

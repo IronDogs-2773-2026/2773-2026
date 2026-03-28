@@ -55,7 +55,7 @@ public class XBOXDriveCommand extends Command {
   @Override
   public void execute() {
     buttonMicroCommands();
-    double XAxis = xbox.getLeftX(), YAxis = xbox.getLeftY(), ZAxis = xbox.getRightX();
+    double XAxis = xbox.getLeftX(), YAxis = xbox.getLeftY(), ZAxis = -xbox.getRightX();
     double rawAngle = Math.atan2(YAxis, XAxis);
     double gyroAngle = odomSub.getGyroAngle() - driveHeadingOffset;
     if (xbox.getPOV() == 0) {

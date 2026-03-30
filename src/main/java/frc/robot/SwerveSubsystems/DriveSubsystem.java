@@ -210,7 +210,7 @@ public class DriveSubsystem extends SubsystemBase {
         6.0,            // MOI: 6.0 kg·m²
         new com.pathplanner.lib.config.ModuleConfig(
           0.0508,       // Wheel radius: 0.0508m (from 0.1016m diameter)
-          3,          // Max speed: 3 m/s
+          0.5,          // Max speed: 1 m/s
           1.2,          // Wheel COF: 1.2
           DCMotor.getNEO(1),  // Motor: 1 NEO per module
           6.75,         // Drive gearing: 6.75
@@ -231,14 +231,15 @@ public class DriveSubsystem extends SubsystemBase {
         this::getRobotRelativeSpeeds,        // Robot-relative ChassisSpeeds supplier
         (speeds, feedforwards) -> driveRobotRelative(speeds),
         new PPHolonomicDriveController(
-          new PIDConstants(0.5, 0.0, 0.0),   // Translation PID - lowered from 1.0
-          new PIDConstants(0.5, 0.0, 0.0)    // Rotation PID - lowered from 1.0
+          new PIDConstants(0.1, 0.0, 0.0),   // Translation PID - lowered from 1.00
+          new PIDConstants(0.1, 0.0, 0.0)    // Rotation PID - lowered from 1.0
         ),
         config,
         () -> {
           // Flip paths for red alliance
           var alliance = DriverStation.getAlliance();
-          return alliance.isPresent() ? alliance.get() == DriverStation.Alliance.Red : false;
+          // return alliance.isPresent() ? alliance.get() == DriverStation.Alliance.Red : false;
+          return false; // Disable flipping for testing
         },
         this                                   // Reference to this subsystem
       );

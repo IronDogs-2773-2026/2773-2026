@@ -89,7 +89,7 @@ public class SwerveDriveModule {
     // TODO: verify steerAngle() = 0 means physical forward on the robot. If not, a fixed
     // offset (e.g. -Math.PI/2) must be added: directionalDrive(speed, -angle - Math.PI/2)
     double speed = desiredState.speedMetersPerSecond / Constants.MaxDriveSpeed;
-    directionalDrive(speed, -desiredState.angle.getRadians());
+    directionalDrive(MathUtil.clamp(speed, -1.0, 1.0), -desiredState.angle.getRadians());
   }
 
   public double steerAngle() {

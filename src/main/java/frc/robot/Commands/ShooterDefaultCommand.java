@@ -28,7 +28,7 @@ public class ShooterDefaultCommand extends Command {
   public void execute() {
     shoot.directRun(xbox.getLeftY());
     shoot.runFeeder(xbox.getLeftX());
-    shoot.runArm(xbox.getRightTriggerAxis());
+    shoot.runArm(xbox.getRightTriggerAxis() - xbox.getLeftTriggerAxis());
     shoot.runIntake(xbox.getRightX());
   }
 

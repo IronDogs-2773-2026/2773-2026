@@ -89,9 +89,19 @@ public class RobotContainer {
       PathPlannerPath newPath = PathPlannerPath.fromPathFile("Red1");
       PathConstraints constraints = new PathConstraints(1.0, 1.0, Math.PI, Math.PI);
       new JoystickButton(xbox, XboxController.Button.kA.value)
-          .whileTrue(AutoBuilder.pathfindThenFollowPath(newPath, constraints));
+          .whileTrue(AutoBuilder.followPath(newPath));
     } catch (Exception e) {
       System.err.println("FAILED to load 'Red1' for A button: " + e.getMessage());
+    }
+
+    // Y button: follow "New New Path"
+    try {
+      PathPlannerPath newPath = PathPlannerPath.fromPathFile("New New Path");
+      PathConstraints constraints = new PathConstraints(1.0, 1.0, Math.PI, Math.PI);
+      new JoystickButton(xbox, XboxController.Button.kY.value)
+          .whileTrue(AutoBuilder.followPath(newPath));
+    } catch (Exception e) {
+      System.err.println("FAILED to load 'New New Path' for Y button: " + e.getMessage());
     }
 
     // X button: run "New Auto" autonomous routine
@@ -131,6 +141,10 @@ public class RobotContainer {
     // shooterSub.setDefaultCommand(
     //   new RunCommand(() -> shooterSub.setArmSpeed(-shooterXbox.getRightY()), shooterSub)
     // );
+
+    new JoystickButton(shooterXbox, XboxController.Button.kRightBumper.value)
+        .whileTrue(new ShooterCommand(shooterSub, 0.6, 0.6, 0.5, true));
+
     shooterSub.setDefaultCommand(new ShooterDefaultCommand(shooterSub, shooterXbox));
   }
 

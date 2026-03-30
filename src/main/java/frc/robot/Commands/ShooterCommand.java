@@ -6,6 +6,7 @@ package frc.robot.Commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.ShooterSubsystem;
+import edu.wpi.first.wpilibj2.command.Commands;
 
 /**
  * Command to run the shooter flywheel at a set speed using direct (open-loop) control.
@@ -15,19 +16,21 @@ public class ShooterCommand extends Command {
   private final ShooterSubsystem shooterSub;
   private final double flywheelSpeed;
   private final double feederSpeed;
+  private final double intakeSpeed;
   private final boolean useFeeder;
 
   /**
    * @param shooterSub    Shooter subsystem
    * @param flywheelSpeed Flywheel speed (-1.0 to 1.0)
    * @param feederSpeed   Feeder speed (0 to 1), or 0 to disable
-   * @param useFeeder     If true, runs feeder after spinup delay
+   * @param useFeederIntake if true, runs feeder after spinup delay
    */
-  public ShooterCommand(ShooterSubsystem shooterSub, double flywheelSpeed, double feederSpeed, boolean useFeeder) {
+  public ShooterCommand(ShooterSubsystem shooterSub, double flywheelSpeed, double feederSpeed, double intakeSpeed, boolean useFeederIntake) {
     this.shooterSub = shooterSub;
     this.flywheelSpeed = flywheelSpeed;
     this.feederSpeed = feederSpeed;
-    this.useFeeder = useFeeder;
+    this.intakeSpeed = intakeSpeed;
+    this.useFeeder = useFeederIntake;
     addRequirements(shooterSub);
   }
 
@@ -43,7 +46,9 @@ public class ShooterCommand extends Command {
     
     // Run feeder after a brief delay (if enabled)
     if (useFeeder) {
-      shooterSub.runFeeder(feederSpeed);
+      Commands.waitSeconds(1.5);
+      shooterSub.runFeeder(-feederSpeed);
+      shooterSub.runIntake(-intakeSpeed); // Optional: run intake to help feed notes
     } else {
       shooterSub.runFeeder(0);
     }

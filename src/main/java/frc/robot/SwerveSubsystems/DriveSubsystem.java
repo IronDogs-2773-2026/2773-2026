@@ -18,7 +18,6 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.system.plant.DCMotor;
 
 public class DriveSubsystem extends SubsystemBase {
   public SwerveDriveModule blMotor = new SwerveDriveModule(Constants.backLeftModuleDriveCANID,
@@ -68,6 +67,13 @@ public class DriveSubsystem extends SubsystemBase {
     flMotor.directionalDrive(speed, angle);
   }
 
+  /**
+   * @deprecated Use {@link #driveRobotRelative(ChassisSpeeds)} instead.
+   * This method incorrectly converts ChassisSpeeds to polar coordinates and ignores
+   * the rotation component (omega). It does not use swerve kinematics and will not
+   * produce correct module states for holonomic drive.
+   */
+  @Deprecated(since = "2026", forRemoval = true)
   public void chassisDrive(ChassisSpeeds chassisSpeeds) {
     directionalDrive(
         Constants.powerVelocityRatio
@@ -199,30 +205,14 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public void initAutoBuilder(OdometrySubsystem odomSub) {
     System.out.println("DriveSubsystem: Starting AutoBuilder initialization...");
-    
-    try {
-      System.out.println("DriveSubsystem: Creating RobotConfig...");
-      
-      // Create RobotConfig inline (more reliable than fromGUISettings)
-      // PathPlannerLib 2026 API - module locations in FL, FR, BL, BR order
-      RobotConfig config = new RobotConfig(
-        50.0,           // Mass: 50 kg
-        6.0,            // MOI: 6.0 kg·m²
-        new com.pathplanner.lib.config.ModuleConfig(
-          0.0508,       // Wheel radius: 0.0508m (from 0.1016m diameter)
-          0.5,          // Max speed: 1 m/s
-          1.2,          // Wheel COF: 1.2
-          DCMotor.getNEO(1),  // Motor: 1 NEO per module
-          6.75,         // Drive gearing: 6.75
-          40            // Current limit: 40A
-        ),
-        Constants.kfrontLeftLocation,    // Front Left
-        Constants.kfrontRightLocation,   // Front Right
-        Constants.kbackLeftLocation,     // Back Left
-        Constants.kbackRightLocation     // Back Right
-      );
 
-      System.out.println("DriveSubsystem: RobotConfig created, configuring AutoBuilder...");
+    try {
+      System.out.println("DriveSubsystem: Loading RobotConfig from GUI settings...");
+
+      // Load RobotConfig from pathplanner/settings.json
+      RobotConfig config = RobotConfig.fromGUISettings();
+
+      System.out.println("DriveSubsystem: RobotConfig loaded, configuring AutoBuilder...");
 
       // Configure AutoBuilder
       AutoBuilder.configure(

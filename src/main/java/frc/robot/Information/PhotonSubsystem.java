@@ -178,9 +178,7 @@ public class PhotonSubsystem extends SubsystemBase {
     if (lastGoodPose == null) {
       return null;
     }
-    var _pose = lastGoodPose.estimatedPose.toPose2d();
-    System.err.println("" + _pose);
-    return _pose;
+    return lastGoodPose.estimatedPose.toPose2d();
   }
 
   public double getPhotonTimestamp() {

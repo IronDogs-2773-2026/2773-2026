@@ -88,6 +88,11 @@ public class SwerveDriveModule {
     // Our directionalDrive convention: equilibrium steerAngle() = -angle, so angle = -wpilib_angle
     // TODO: verify steerAngle() = 0 means physical forward on the robot. If not, a fixed
     // offset (e.g. -Math.PI/2) must be added: directionalDrive(speed, -angle - Math.PI/2)
+    
+    // Optimize module state: choose shortest rotation path (flip 180° if angle diff > 90°)
+    Rotation2d currentAngle = new Rotation2d(steerAngle());
+    desiredState.optimize(currentAngle);
+    
     double speed = desiredState.speedMetersPerSecond / Constants.MaxDriveSpeed;
     directionalDrive(MathUtil.clamp(speed, -1.0, 1.0), -desiredState.angle.getRadians());
   }

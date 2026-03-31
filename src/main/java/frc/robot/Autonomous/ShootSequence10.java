@@ -5,7 +5,7 @@
 package frc.robot.Autonomous;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.ShooterSubsystem;
+import frc.robot.ShooterSubsystem;
 import frc.robot.Commands.ShootSequenceCommand;
 
 /**

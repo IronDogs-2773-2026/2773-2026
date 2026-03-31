@@ -6,7 +6,7 @@ package frc.robot.Commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.ShooterSubsystem;
+import frc.robot.ShooterSubsystem;
 
 /**
  * One-button shoot sequence command.

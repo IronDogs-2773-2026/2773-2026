@@ -24,7 +24,7 @@ import frc.robot.Information.*;
 import frc.robot.Autonomous.ShootSequence5;
 import frc.robot.Autonomous.ShootSequence10;
 import frc.robot.Autonomous.ShootSequence15;
-import frc.ShooterSubsystem;
+import frc.robot.ShooterSubsystem;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 public class RobotContainer {

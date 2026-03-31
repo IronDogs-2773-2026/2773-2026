@@ -5,7 +5,7 @@
 package frc.robot.Commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.ShooterSubsystem;
+import frc.robot.ShooterSubsystem;
 
 /**
  * Command to run the feeder motor at a constant speed.

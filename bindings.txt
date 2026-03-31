@@ -1,0 +1,46 @@
+=====================================
+SHOOTER CONTROLLER BUTTON BINDINGS
+=====================================
+Controller: Xbox Controller (Port 2)
+=====================================
+
+FACE BUTTONS
+------------
+A Button  | Run Feeder (0.5 speed)          | Hold to run feeder for testing/intake
+B Button  | Stop All Motors                 | Hold to stop all shooter motors
+X Button  | Run Intake (0.5 speed)          | Hold to intake notes
+Y Button  | Reverse Intake (-0.5 speed)     | Hold to clear jams
+
+BUMPER BUTTONS
+--------------
+Left Bumper  | Manual Flywheel (0.5 speed)     | Hold to spin flywheels
+Right Bumper | Shoot Sequence (0.6 speed)      | Hold for full shoot sequence
+
+STICK BUTTONS
+-------------
+Left Stick  | Reverse Feeder (-0.3 speed)    | Hold to reverse feeder (clear jams)
+Right Stick | Fast Feeder (1.0 speed)        | Hold for rapid shooting
+
+MENU BUTTONS
+------------
+Start Button  | Zero Arm Position           | Press to calibrate arm encoder
+Back Button   | Toggle PID Mode             | Press to toggle PID mode (logs to console)
+
+AXIS CONTROLS (Default Command)
+-------------------------------
+Left Y-Axis   | Flywheel Speed            | Push up/down to control flywheel
+Left X-Axis   | Feeder Speed              | Push left/right to control feeder
+Right Y-Axis  | Arm Speed                 | Push up/down to control arm
+Right X-Axis  | Intake Speed              | Push left/right to control intake
+Left Trigger  | Arm Speed (Negative)      | Press to lower arm
+Right Trigger | Arm Speed (Positive)      | Press to raise arm
+
+=====================================
+QUICK REFERENCE
+=====================================
+Shoot: Right Bumper
+Intake: X Button
+Stop Everything: B Button
+Clear Jam: Y Button (intake) + Left Stick (feeder)
+Rapid Fire: Right Stick (fast feeder)
+Calibrate Arm: Start Button

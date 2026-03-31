@@ -125,27 +125,48 @@ public class RobotContainer {
         .whileTrue(new ShootSequenceCommand(shooterSub, 0.6, 0.5, 1.0, 0.5));
 
     // === SHOOTER CONTROLLER (Xbox port 2) ===
-    // Right bumper: shoot sequence
-    // new JoystickButton(shooterXbox, XboxController.Button.kRightBumper.value)
-    //     .whileTrue(new ShootSequenceCommand(shooterSub, 0.6, 0.5, 1.0, 0.5));
+    // Default command: axis-based manual control for all shooter functions
+    shooterSub.setDefaultCommand(new ShooterDefaultCommand(shooterSub, shooterXbox));
 
-    // // Left bumper: manual flywheel control (hold to spin)
-    // new JoystickButton(shooterXbox, XboxController.Button.kLeftBumper.value)
-    //     .whileTrue(new ShooterCommand(shooterSub, 0.5, 0, false));
+    // A button: run feeder only (for testing/intake)
+    new JoystickButton(shooterXbox, XboxController.Button.kA.value)
+        .whileTrue(new RunFeederCommand(shooterSub, 0.5));
 
-    // // A button: run feeder only (for testing/intake)
-    // new JoystickButton(shooterXbox, XboxController.Button.kA.value)
-    //     .whileTrue(new RunFeederCommand(shooterSub, 0.5));
+    // B button: stop all shooter motors
+    new JoystickButton(shooterXbox, XboxController.Button.kB.value)
+        .whileTrue(new RunCommand(() -> shooterSub.stop(), shooterSub));
 
-    // Right stick Y-axis: arm control (default command)
-    // shooterSub.setDefaultCommand(
-    //   new RunCommand(() -> shooterSub.setArmSpeed(-shooterXbox.getRightY()), shooterSub)
-    // );
+    // X button: run intake (hold to intake)
+    new JoystickButton(shooterXbox, XboxController.Button.kX.value)
+        .whileTrue(new RunCommand(() -> shooterSub.runIntake(0.5), shooterSub));
 
+    // Y button: reverse intake (for clearing jams)
+    new JoystickButton(shooterXbox, XboxController.Button.kY.value)
+        .whileTrue(new RunCommand(() -> shooterSub.runIntake(-0.5), shooterSub));
+
+    // Left bumper: manual flywheel control (hold to spin)
+    new JoystickButton(shooterXbox, XboxController.Button.kLeftBumper.value)
+        .whileTrue(new ShooterCommand(shooterSub, 0.5, 0, false));
+
+    // Right bumper: shoot sequence (spin up, wait, then shoot)
     new JoystickButton(shooterXbox, XboxController.Button.kRightBumper.value)
         .whileTrue(new ShooterCommand(shooterSub, 0.6, 0.6, 0.5, true));
 
-    shooterSub.setDefaultCommand(new ShooterDefaultCommand(shooterSub, shooterXbox));
+    // Left stick button: reverse feeder (for clearing jams)
+    new JoystickButton(shooterXbox, XboxController.Button.kLeftStick.value)
+        .whileTrue(new RunCommand(() -> shooterSub.runFeeder(-0.3), shooterSub));
+
+    // Right stick button: fast feeder (for rapid shooting)
+    new JoystickButton(shooterXbox, XboxController.Button.kRightStick.value)
+        .whileTrue(new RunCommand(() -> shooterSub.runFeeder(1.0), shooterSub));
+
+    // Start button: zero arm position (calibration)
+    new JoystickButton(shooterXbox, XboxController.Button.kStart.value)
+        .onTrue(new RunCommand(() -> armMotor.getEncoder().setPosition(0), shooterSub));
+
+    // Back/Select button: toggle PID mode (placeholder - logs to console)
+    new JoystickButton(shooterXbox, XboxController.Button.kBack.value)
+        .onTrue(new RunCommand(() -> System.out.println("PID mode toggled"), shooterSub));
   }
 
   void acceptEstimatedRobotPose(Pose2d pose, double timestamp, Matrix<N3, N1> estimationStdDevs) {

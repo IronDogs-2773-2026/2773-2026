@@ -8,24 +8,31 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
+
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import frc.robot.SwerveSubsystems.*;
-import frc.robot.Commands.*;
-import frc.robot.Information.*;
-import frc.robot.Autonomous.ShootSequence5;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Autonomous.ShootSequence10;
 import frc.robot.Autonomous.ShootSequence15;
-import frc.robot.ShooterSubsystem;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.Autonomous.ShootSequence5;
+import frc.robot.Commands.DriveDistanceCommand;
+import frc.robot.Commands.LowerArm;
+import frc.robot.Commands.RunFeederCommand;
+import frc.robot.Commands.ShootSequenceCommand;
+import frc.robot.Commands.ShooterCommand;
+import frc.robot.Commands.ShooterDefaultCommand;
+import frc.robot.Commands.XBOXDriveCommand;
+import frc.robot.Information.OdometrySubsystem;
+import frc.robot.Information.VisionSubsystem;
+import frc.robot.SwerveSubsystems.DriveSubsystem;
 
 public class RobotContainer {
   // Autonomous chooser
@@ -115,6 +122,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("Shoot Sequence 5", new ShootSequence5(shooterSub));
     NamedCommands.registerCommand("Shoot Sequence 10", new ShootSequence10(shooterSub));
     NamedCommands.registerCommand("Shoot Sequence 15", new ShootSequence15(shooterSub));
+    NamedCommands.registerCommand("Lower Arm", new LowerArm(shooterSub));
 
     // B button: drive 1 meter forward (field-relative)
     new JoystickButton(xbox, XboxController.Button.kB.value)
@@ -138,31 +146,39 @@ public class RobotContainer {
 
     // X button: run intake (hold to intake)
     new JoystickButton(shooterXbox, XboxController.Button.kX.value)
-        .whileTrue(new RunCommand(() -> shooterSub.runIntake(0.5), shooterSub));
+        .whileTrue(new RunCommand(() -> shooterSub.runIntake(-0.8), shooterSub));
 
     // Y button: reverse intake (for clearing jams)
     new JoystickButton(shooterXbox, XboxController.Button.kY.value)
-        .whileTrue(new RunCommand(() -> shooterSub.runIntake(-0.5), shooterSub));
+        .whileTrue(new RunCommand(() -> shooterSub.runIntake(0.5), shooterSub));
 
-    // Left bumper: manual flywheel control (hold to spin)
+    // Left bumper: run arm full reverse (hold to lower arm)
     new JoystickButton(shooterXbox, XboxController.Button.kLeftBumper.value)
-        .whileTrue(new ShooterCommand(shooterSub, 0.5, 0, false));
+        .whileTrue(new RunCommand(() -> shooterSub.runArm(-0.2), shooterSub));
 
-    // Right bumper: shoot sequence (spin up, wait, then shoot)
+    // Right bumper: run arm full forward (hold to raise arm)
     new JoystickButton(shooterXbox, XboxController.Button.kRightBumper.value)
-        .whileTrue(new ShooterCommand(shooterSub, 0.6, 0.6, 0.5, true));
+        .whileTrue(new RunCommand(() -> shooterSub.runArm(0.2), shooterSub));
+
+    // Left trigger (>0.5): manual flywheel control (hold to spin)
+    new Trigger(() -> shooterXbox.getLeftTriggerAxis() > 0.5)
+        .whileTrue(new ShooterCommand(shooterSub, 0.9, 0.0, 0.0, false));
+
+    // Right trigger (>0.5): shoot sequence (spin up, wait, then shoot)
+    new Trigger(() -> shooterXbox.getRightTriggerAxis() > 0.5)
+        .whileTrue(new ShooterCommand(shooterSub, 0.8, 0.6, 0.5, true));
 
     // Left stick button: reverse feeder (for clearing jams)
     new JoystickButton(shooterXbox, XboxController.Button.kLeftStick.value)
-        .whileTrue(new RunCommand(() -> shooterSub.runFeeder(-0.3), shooterSub));
+        .whileTrue(new RunCommand(() -> shooterSub.runFeeder(0.3), shooterSub));
 
     // Right stick button: fast feeder (for rapid shooting)
     new JoystickButton(shooterXbox, XboxController.Button.kRightStick.value)
-        .whileTrue(new RunCommand(() -> shooterSub.runFeeder(1.0), shooterSub));
+        .whileTrue(new RunCommand(() -> shooterSub.runFeeder(-1.0), shooterSub));
 
     // Start button: zero arm position (calibration)
     new JoystickButton(shooterXbox, XboxController.Button.kStart.value)
-        .onTrue(new RunCommand(() -> armMotor.getEncoder().setPosition(0), shooterSub));
+        .onTrue(new RunCommand(() -> shooterSub.runArm(0), shooterSub));
 
     // Back/Select button: toggle PID mode (placeholder - logs to console)
     new JoystickButton(shooterXbox, XboxController.Button.kBack.value)

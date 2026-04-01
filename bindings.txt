@@ -8,39 +8,75 @@ FACE BUTTONS
 ------------
 A Button  | Run Feeder (0.5 speed)          | Hold to run feeder for testing/intake
 B Button  | Stop All Motors                 | Hold to stop all shooter motors
-X Button  | Run Intake (0.5 speed)          | Hold to intake notes
-Y Button  | Reverse Intake (-0.5 speed)     | Hold to clear jams
+X Button  | Run Intake (-0.8 speed)         | Hold to intake notes
+Y Button  | Reverse Intake (0.5 speed)      | Hold to clear jams
 
 BUMPER BUTTONS
 --------------
-Left Bumper  | Manual Flywheel (0.5 speed)     | Hold to spin flywheels
-Right Bumper | Shoot Sequence (0.6 speed)      | Hold for full shoot sequence
+Left Bumper   | Run Arm Full Reverse (-1.0)   | Hold to lower arm
+Right Bumper  | Run Arm Full Forward (1.0)    | Hold to raise arm
+
+TRIGGER BUTTONS
+---------------
+Left Trigger (>0.5)  | Manual Flywheel (0.7 speed)   | Press >50% to spin flywheels
+Right Trigger (>0.5) | Shoot Sequence (0.8 flywheel, | Press >50% for full shoot sequence
+                     | 0.6 feeder, 0.5s spinup)
 
 STICK BUTTONS
 -------------
-Left Stick  | Reverse Feeder (-0.3 speed)    | Hold to reverse feeder (clear jams)
-Right Stick | Fast Feeder (1.0 speed)        | Hold for rapid shooting
+Left Stick  | Reverse Feeder (0.3 speed)     | Hold to reverse feeder (clear jams)
+Right Stick | Fast Feeder (-1.0 speed)       | Hold for rapid shooting
 
 MENU BUTTONS
 ------------
 Start Button  | Zero Arm Position           | Press to calibrate arm encoder
 Back Button   | Toggle PID Mode             | Press to toggle PID mode (logs to console)
 
-AXIS CONTROLS (Default Command)
+AXIS CONTROLS (Default Command - ShooterDefaultCommand)
 -------------------------------
-Left Y-Axis   | Flywheel Speed            | Push up/down to control flywheel
-Left X-Axis   | Feeder Speed              | Push left/right to control feeder
-Right Y-Axis  | Arm Speed                 | Push up/down to control arm
-Right X-Axis  | Intake Speed              | Push left/right to control intake
-Left Trigger  | Arm Speed (Negative)      | Press to lower arm
-Right Trigger | Arm Speed (Positive)      | Press to raise arm
+Controlled via ShooterDefaultCommand using shooterXbox axis inputs
 
 =====================================
-QUICK REFERENCE
+DRIVER CONTROLLER BUTTON BINDINGS
 =====================================
-Shoot: Right Bumper
+Controller: Xbox Controller (Port 0)
+=====================================
+
+FACE BUTTONS
+------------
+A Button  | Pathfind to "Red1" path            | Hold to pathfind and follow path
+B Button  | Drive 1 meter forward              | Hold to drive distance command
+X Button  | Run "New Auto" autonomous          | Hold to run autonomous routine
+Y Button  | Follow "New New Path"              | Hold to follow path
+
+BUMPER BUTTONS
+--------------
+Right Bumper | Shoot Sequence (0.6 speed,      | Hold for full shoot sequence
+             | 0.5 feeder, 1s shoot, 0.5s spinup)
+
+TRIGGER BUTTONS
+---------------
+Left Trigger   | (Not used)
+Right Trigger (>0.5) | Slowdown Mode (0.7x speed) | Press >50% for precision driving
+
+=====================================
+QUICK REFERENCE - SHOOTER
+=====================================
+Shoot: Right Trigger (>0.5)
 Intake: X Button
 Stop Everything: B Button
 Clear Jam: Y Button (intake) + Left Stick (feeder)
 Rapid Fire: Right Stick (fast feeder)
+Raise Arm: Right Bumper
+Lower Arm: Left Bumper
 Calibrate Arm: Start Button
+
+=====================================
+QUICK REFERENCE - DRIVER
+=====================================
+Pathfind to Red1: A Button
+Drive 1m Forward: B Button
+Run New Auto: X Button
+Follow New New Path: Y Button
+Shoot Sequence: Right Bumper
+Slowdown Mode: Right Trigger (>0.5)

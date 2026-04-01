@@ -51,10 +51,15 @@ public class XBOXDriveCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   double oldT = 0.0;
   double oldG = 0.0;
+  double slowdownFactor = 1.0;
 
   @Override
   public void execute() {
     buttonMicroCommands();
+    
+    // Check right trigger for slowdown mode
+    slowdownFactor = xbox.getRightTriggerAxis() > 0.5 ? Constants.SlowdownFactor : 1.0;
+    
     double XAxis = xbox.getLeftX(), YAxis = xbox.getLeftY(), ZAxis = -xbox.getRightX();
     double rawAngle = Math.atan2(YAxis, XAxis);
     double gyroAngle = odomSub.getGyroAngle() - driveHeadingOffset;
@@ -77,7 +82,7 @@ public class XBOXDriveCommand extends Command {
 
     pid.setSetpoint(setDistance);
     double driveSpeed = pid.calculate((driveSubsystem.averageDistanceEncoder() - oldT) * 11.24)
-        * Constants.MaxDriveSpeed * sensitivity;
+        * Constants.MaxDriveSpeed * sensitivity * slowdownFactor;
 
     if (xbox.getPOV() != -1) {
       rotSpeed = povRotate();
@@ -90,7 +95,7 @@ public class XBOXDriveCommand extends Command {
       if (Math.abs(ZAxis) > 0) {
         odomSub.getGyroAngle();
       }
-      driveSubsystem.directionalDrive(driveSpeed, rawAngle - gyroAngle, rotSpeed);
+      driveSubsystem.directionalDrive(driveSpeed, rawAngle - gyroAngle, rotSpeed * slowdownFactor);
     }
     oldT = driveSubsystem.averageDistanceEncoder();
     oldG = odomSub.getGyroAngle();

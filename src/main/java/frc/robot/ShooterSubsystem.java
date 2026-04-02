@@ -91,6 +91,7 @@ public class ShooterSubsystem extends SubsystemBase {
     flyWheelTwo.set(0);
     feederMotor.set(0);
     armMotor.set(0);
+    intakeMotor.set(0);
   }
 
   /**

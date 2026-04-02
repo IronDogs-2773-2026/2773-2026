@@ -24,6 +24,10 @@ import frc.robot.Autonomous.ShootSequence10;
 import frc.robot.Autonomous.ShootSequence15;
 import frc.robot.Autonomous.ShootSequence5;
 import frc.robot.Commands.DriveDistanceCommand;
+import frc.robot.Commands.Intake10;
+import frc.robot.Commands.Intake3;
+import frc.robot.Commands.Intake5;
+import frc.robot.Commands.Intake7;
 import frc.robot.Commands.LowerArm;
 import frc.robot.Commands.RunFeederCommand;
 import frc.robot.Commands.ShootSequenceCommand;
@@ -91,7 +95,9 @@ public class RobotContainer {
     // Command scheduler
     driveSub.setDefaultCommand(driveCommand);
 
+    // === AUTO PATH BUTTONS (COMMENTED OUT FOR COMPETITION) ===
     // A button: pathfind to start of "Red1" then follow it
+    /*
     try {
       PathPlannerPath newPath = PathPlannerPath.fromPathFile("Red1");
       PathConstraints constraints = new PathConstraints(1.0, 1.0, Math.PI, Math.PI);
@@ -100,8 +106,10 @@ public class RobotContainer {
     } catch (Exception e) {
       System.err.println("FAILED to load 'Red1' for A button: " + e.getMessage());
     }
+    */
 
     // Y button: follow "New New Path"
+    /*
     try {
       PathPlannerPath newPath = PathPlannerPath.fromPathFile("New New Path");
       PathConstraints constraints = new PathConstraints(1.0, 1.0, Math.PI, Math.PI);
@@ -110,19 +118,26 @@ public class RobotContainer {
     } catch (Exception e) {
       System.err.println("FAILED to load 'New New Path' for Y button: " + e.getMessage());
     }
+    */
 
     // X button: run "New Auto" autonomous routine
+    /*
     try {
       new JoystickButton(xbox, XboxController.Button.kX.value)
           .whileTrue(AutoBuilder.buildAuto("New Auto"));
     } catch (Exception e) {
       System.err.println("FAILED to load 'New Auto' for X button: " + e.getMessage());
     }
+    */
 
     NamedCommands.registerCommand("Shoot Sequence 5", new ShootSequence5(shooterSub));
     NamedCommands.registerCommand("Shoot Sequence 10", new ShootSequence10(shooterSub));
     NamedCommands.registerCommand("Shoot Sequence 15", new ShootSequence15(shooterSub));
     NamedCommands.registerCommand("Lower Arm", new LowerArm(shooterSub));
+    NamedCommands.registerCommand("Intake 3", new Intake3(shooterSub));
+    NamedCommands.registerCommand("Intake 5", new Intake5(shooterSub));
+    NamedCommands.registerCommand("Intake 7", new Intake7(shooterSub));
+    NamedCommands.registerCommand("Intake 10", new Intake10(shooterSub));
 
     // B button: drive 1 meter forward (field-relative)
     new JoystickButton(xbox, XboxController.Button.kB.value)
@@ -154,19 +169,21 @@ public class RobotContainer {
 
     // Left bumper: run arm full reverse (hold to lower arm)
     new JoystickButton(shooterXbox, XboxController.Button.kLeftBumper.value)
-        .whileTrue(new RunCommand(() -> shooterSub.runArm(-0.2), shooterSub));
+        .whileTrue(new RunCommand(() -> shooterSub.runArm(-0.2), shooterSub))
+        .onFalse(new RunCommand(() -> shooterSub.runArm(0), shooterSub));
 
     // Right bumper: run arm full forward (hold to raise arm)
     new JoystickButton(shooterXbox, XboxController.Button.kRightBumper.value)
-        .whileTrue(new RunCommand(() -> shooterSub.runArm(0.2), shooterSub));
+        .whileTrue(new RunCommand(() -> shooterSub.runArm(0.2), shooterSub))
+        .onFalse(new RunCommand(() -> shooterSub.runArm(0), shooterSub));
 
     // Left trigger (>0.5): manual flywheel control (hold to spin)
     new Trigger(() -> shooterXbox.getLeftTriggerAxis() > 0.5)
-        .whileTrue(new ShooterCommand(shooterSub, 0.9, 0.0, 0.0, false));
+        .whileTrue(new ShooterCommand(shooterSub, 0.9, 0.0, 0.0, false, false));
 
     // Right trigger (>0.5): shoot sequence (spin up, wait, then shoot)
     new Trigger(() -> shooterXbox.getRightTriggerAxis() > 0.5)
-        .whileTrue(new ShooterCommand(shooterSub, 0.8, 0.6, 0.5, true));
+        .whileTrue(new ShooterCommand(shooterSub, 0.8, 0.6, 0.5, true, false));
 
     // Left stick button: reverse feeder (for clearing jams)
     new JoystickButton(shooterXbox, XboxController.Button.kLeftStick.value)

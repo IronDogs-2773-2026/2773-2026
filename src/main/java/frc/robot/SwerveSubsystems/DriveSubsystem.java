@@ -228,8 +228,7 @@ public class DriveSubsystem extends SubsystemBase {
         () -> {
           // Flip paths for red alliance
           var alliance = DriverStation.getAlliance();
-          // return alliance.isPresent() ? alliance.get() == DriverStation.Alliance.Red : false;
-          return false; // Disable flipping for testing
+          return alliance.isPresent() ? alliance.get() == DriverStation.Alliance.Red : false;
         },
         this                                   // Reference to this subsystem
       );

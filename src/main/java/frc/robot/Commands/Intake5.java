@@ -4,8 +4,8 @@
 
 package frc.robot.Commands;
 
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.ShooterSubsystem;
 
 /**
@@ -15,7 +15,7 @@ import frc.robot.ShooterSubsystem;
 public class Intake5 extends SequentialCommandGroup {
   public Intake5(ShooterSubsystem shooterSub) {
     super(
-      Commands.runEnd(() -> shooterSub.runIntake(0.5), () -> shooterSub.runIntake(0), shooterSub)
+      Commands.runEnd(() -> shooterSub.runIntake(-0.5), () -> shooterSub.runIntake(0), shooterSub)
         .withTimeout(5.0)
     );
   }

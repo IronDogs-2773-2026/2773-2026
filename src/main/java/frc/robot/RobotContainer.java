@@ -6,7 +6,6 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.Matrix;
@@ -17,20 +16,20 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Autonomous.ShootSequence10;
 import frc.robot.Autonomous.ShootSequence15;
 import frc.robot.Autonomous.ShootSequence5;
-import frc.robot.Commands.DriveDistanceCommand;
 import frc.robot.Commands.Intake10;
 import frc.robot.Commands.Intake3;
 import frc.robot.Commands.Intake5;
 import frc.robot.Commands.Intake7;
 import frc.robot.Commands.LowerArm;
+import frc.robot.Commands.EmergencyInvertCommand;
 import frc.robot.Commands.RunFeederCommand;
-import frc.robot.Commands.ShootSequenceCommand;
 import frc.robot.Commands.ShooterCommand;
 import frc.robot.Commands.ShooterDefaultCommand;
 import frc.robot.Commands.XBOXDriveCommand;
@@ -66,7 +65,7 @@ public class RobotContainer {
 
     // Create chooser and set default option
     autoChooser = new SendableChooser<>();
-    autoChooser.setDefaultOption("None", null);
+    autoChooser.setDefaultOption("Gunner's Auto", AutoBuilder.buildAuto("Gunner's Auto"));
 
     // Try to load paths manually
     try {
@@ -84,6 +83,15 @@ public class RobotContainer {
       System.out.println("RobotContainer: SUCCESS - Added 'New Path' to chooser");
     } catch (Exception e) {
       System.err.println("FAILED to load 'New Path': " + e.getMessage());
+      e.printStackTrace();
+    }
+
+    // Add "Gunner's Auto" full autonomous routine
+    try {
+      autoChooser.addOption("Gunner's Auto", AutoBuilder.buildAuto("Gunner's Auto"));
+      System.out.println("RobotContainer: SUCCESS - Added 'Gunner's Auto' to chooser");
+    } catch (Exception e) {
+      System.err.println("FAILED to load 'Gunner's Auto': " + e.getMessage());
       e.printStackTrace();
     }
 
@@ -139,13 +147,17 @@ public class RobotContainer {
     NamedCommands.registerCommand("Intake 7", new Intake7(shooterSub));
     NamedCommands.registerCommand("Intake 10", new Intake10(shooterSub));
 
-    // B button: drive 1 meter forward (field-relative)
+    // // B button: drive 1 meter forward (field-relative)
+    // new JoystickButton(xbox, XboxController.Button.kB.value)
+    //     .whileTrue(new DriveDistanceCommand(driveSub, odomSub, -1.0, 0.0, 0.3));
+
+    // B button: emergency 180° invert
     new JoystickButton(xbox, XboxController.Button.kB.value)
-        .whileTrue(new DriveDistanceCommand(driveSub, odomSub, -1.0, 0.0, 0.3));
+        .onTrue(new EmergencyInvertCommand(driveCommand));
 
     // Right bumper: one-button shoot sequence (0.6 speed, 0.5 feeder, 1s shoot, 0.5s spinup)
-    new JoystickButton(xbox, XboxController.Button.kRightBumper.value)
-        .whileTrue(new ShootSequenceCommand(shooterSub, 0.6, 0.5, 1.0, 0.5));
+    // new JoystickButton(xbox, XboxController.Button.kRightBumper.value)
+    //     .whileTrue(new ShootSequenceCommand(shooterSub, 0.6, 0.5, 1.0, 0.5));
 
     // === SHOOTER CONTROLLER (Xbox port 2) ===
     // Default command: axis-based manual control for all shooter functions
@@ -153,33 +165,31 @@ public class RobotContainer {
 
     // A button: run feeder only (for testing/intake)
     new JoystickButton(shooterXbox, XboxController.Button.kA.value)
-        .whileTrue(new RunFeederCommand(shooterSub, 0.5));
+        .whileTrue(new RunFeederCommand(shooterSub, -0.7));
 
     // B button: stop all shooter motors
     new JoystickButton(shooterXbox, XboxController.Button.kB.value)
         .whileTrue(new RunCommand(() -> shooterSub.stop(), shooterSub));
 
-    // X button: run intake (hold to intake)
-    new JoystickButton(shooterXbox, XboxController.Button.kX.value)
-        .whileTrue(new RunCommand(() -> shooterSub.runIntake(-0.8), shooterSub));
+    // POV Up: run arm up (hold to raise arm)
+    new Trigger(() -> shooterXbox.getPOV() == 0)
+        .whileTrue(new RunCommand(() -> shooterSub.runArm(0.12), shooterSub));
 
-    // Y button: reverse intake (for clearing jams)
-    new JoystickButton(shooterXbox, XboxController.Button.kY.value)
+    // POV Down: run arm down (hold to lower arm)
+    new Trigger(() -> shooterXbox.getPOV() == 180)
+        .whileTrue(new RunCommand(() -> shooterSub.runArm(-0.12), shooterSub));
+
+    // Left bumper: reverse intake (for clearing jams)
+    new JoystickButton(shooterXbox, XboxController.Button.kLeftBumper.value)
         .whileTrue(new RunCommand(() -> shooterSub.runIntake(0.5), shooterSub));
 
-    // Left bumper: run arm full reverse (hold to lower arm)
-    new JoystickButton(shooterXbox, XboxController.Button.kLeftBumper.value)
-        .whileTrue(new RunCommand(() -> shooterSub.runArm(-0.2), shooterSub))
-        .onFalse(new RunCommand(() -> shooterSub.runArm(0), shooterSub));
-
-    // Right bumper: run arm full forward (hold to raise arm)
+    // Right bumper: run intake (hold to intake)
     new JoystickButton(shooterXbox, XboxController.Button.kRightBumper.value)
-        .whileTrue(new RunCommand(() -> shooterSub.runArm(0.2), shooterSub))
-        .onFalse(new RunCommand(() -> shooterSub.runArm(0), shooterSub));
+        .whileTrue(new RunCommand(() -> shooterSub.runIntake(-0.8), shooterSub));
 
-    // Left trigger (>0.5): manual flywheel control (hold to spin)
+    // Left trigger (>0.5): manual flywheel control (hold to run continuously)
     new Trigger(() -> shooterXbox.getLeftTriggerAxis() > 0.5)
-        .whileTrue(new ShooterCommand(shooterSub, 0.9, 0.0, 0.0, false, false));
+        .whileTrue(new RunCommand(() -> shooterSub.directRun(0.9), shooterSub));
 
     // Right trigger (>0.5): shoot sequence (spin up, wait, then shoot)
     new Trigger(() -> shooterXbox.getRightTriggerAxis() > 0.5)

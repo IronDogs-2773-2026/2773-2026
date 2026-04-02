@@ -13,19 +13,13 @@
         {
           "type": "named",
           "data": {
-            "name": "Feeder Motor"
+            "name": "Intake 5"
           }
         },
         {
           "type": "path",
           "data": {
             "pathName": "Collect my Balls"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Stop Feeder"
           }
         },
         {

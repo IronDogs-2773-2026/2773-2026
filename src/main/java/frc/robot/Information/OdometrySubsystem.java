@@ -37,7 +37,8 @@ public class OdometrySubsystem extends SubsystemBase {
     Pose2d pose = new Pose2d();
     Field2d field = new Field2d();
     public OdometrySubsystem(DriveSubsystem driveSub) {
-        gyro.reset();
+        // TODO: removing gyro reset flagged here,
+        // gyro.reset();
         this.driveSub = driveSub;
         modules = driveSub.modules;
         m_poseEstimator = new SwerveDrivePoseEstimator(

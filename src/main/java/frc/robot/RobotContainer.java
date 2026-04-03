@@ -12,25 +12,31 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Autonomous.ShootSequence1;
 import frc.robot.Autonomous.ShootSequence10;
 import frc.robot.Autonomous.ShootSequence15;
+import frc.robot.Autonomous.ShootSequence2;
+import frc.robot.Autonomous.ShootSequence3;
 import frc.robot.Autonomous.ShootSequence5;
+import frc.robot.Commands.EmergencyInvertCommand;
+import frc.robot.Commands.Intake1;
 import frc.robot.Commands.Intake10;
+import frc.robot.Commands.Intake2;
 import frc.robot.Commands.Intake3;
 import frc.robot.Commands.Intake5;
 import frc.robot.Commands.Intake7;
 import frc.robot.Commands.LowerArm;
-import frc.robot.Commands.EmergencyInvertCommand;
 import frc.robot.Commands.RunFeederCommand;
-import frc.robot.Commands.ShooterCommand;
+import frc.robot.Commands.ShootSequenceCommand;
 import frc.robot.Commands.ShooterDefaultCommand;
 import frc.robot.Commands.XBOXDriveCommand;
 import frc.robot.Information.OdometrySubsystem;
@@ -40,6 +46,9 @@ import frc.robot.SwerveSubsystems.DriveSubsystem;
 public class RobotContainer {
   // Autonomous chooser
   private SendableChooser<Command> autoChooser;
+  
+  // Alliance selector dropdown
+  private SendableChooser<String> allianceChooser;
 
   // Controllers
   XboxController xbox = new XboxController(0);
@@ -95,10 +104,47 @@ public class RobotContainer {
       e.printStackTrace();
     }
 
+    // Add "revised gunner auto" full autonomous routine
+    try {
+      autoChooser.addOption("revised gunner auto", AutoBuilder.buildAuto("revised gunner auto"));
+      System.out.println("RobotContainer: SUCCESS - Added 'revised gunner auto' to chooser");
+    } catch (Exception e) {
+      System.err.println("FAILED to load 'revised gunner auto': " + e.getMessage());
+      e.printStackTrace();
+    }
+
+    // Add "noah auto" full autonomous routine
+    try {
+      autoChooser.addOption("noah auto", AutoBuilder.buildAuto("noah auto"));
+      System.out.println("RobotContainer: SUCCESS - Added 'noah auto' to chooser");
+    } catch (Exception e) {
+      System.err.println("FAILED to load 'noah auto': " + e.getMessage());
+      e.printStackTrace();
+    }
+
     System.out.println("RobotContainer: AutoChooser created with options");
     System.out.println("RobotContainer: Putting AutoChooser on SmartDashboard...");
     SmartDashboard.putData("AutoChooser", autoChooser);
     System.out.println("RobotContainer: Done! Check SmartDashboard for 'AutoChooser'");
+
+    // Simple shoot-only auto (no PathPlanner)
+    try {
+      autoChooser.addOption("Simple Shoot", new ShootSequenceCommand(shooterSub, 0.55, 0.75, 9.0, 1.5));
+      System.out.println("RobotContainer: SUCCESS - Added 'Simple Shoot' to chooser");
+    } catch (Exception e) {
+      System.err.println("FAILED to load 'Simple Shoot': " + e.getMessage());
+      e.printStackTrace();
+    }
+
+    // Alliance selector dropdown
+    allianceChooser = new SendableChooser<>();
+    allianceChooser.setDefaultOption("Use FMS", "fms");
+    allianceChooser.addOption("Force Blue", "blue");
+    allianceChooser.addOption("Force Red", "red");
+    SmartDashboard.putData("Alliance Selector", allianceChooser);
+    
+    // Update driveSub's alliance cache based on selector
+    periodicAllianceUpdate();
 
     // Command scheduler
     driveSub.setDefaultCommand(driveCommand);
@@ -138,10 +184,15 @@ public class RobotContainer {
     }
     */
 
+    NamedCommands.registerCommand("Shoot Sequence 1", new ShootSequence1(shooterSub));
+    NamedCommands.registerCommand("Shoot Sequence 2", new ShootSequence2(shooterSub));
+    NamedCommands.registerCommand("Shoot Sequence 3", new ShootSequence3(shooterSub));
     NamedCommands.registerCommand("Shoot Sequence 5", new ShootSequence5(shooterSub));
     NamedCommands.registerCommand("Shoot Sequence 10", new ShootSequence10(shooterSub));
     NamedCommands.registerCommand("Shoot Sequence 15", new ShootSequence15(shooterSub));
     NamedCommands.registerCommand("Lower Arm", new LowerArm(shooterSub));
+    NamedCommands.registerCommand("Intake 1", new Intake1(shooterSub));
+    NamedCommands.registerCommand("Intake 2", new Intake2(shooterSub));
     NamedCommands.registerCommand("Intake 3", new Intake3(shooterSub));
     NamedCommands.registerCommand("Intake 5", new Intake5(shooterSub));
     NamedCommands.registerCommand("Intake 7", new Intake7(shooterSub));
@@ -172,12 +223,12 @@ public class RobotContainer {
         .whileTrue(new RunCommand(() -> shooterSub.stop(), shooterSub));
 
     // POV Up: run arm up (hold to raise arm)
-    new Trigger(() -> shooterXbox.getPOV() == 0)
+    new Trigger(() -> shooterXbox.getPOV() == 180)
         .whileTrue(new RunCommand(() -> shooterSub.runArm(0.12), shooterSub));
 
     // POV Down: run arm down (hold to lower arm)
-    new Trigger(() -> shooterXbox.getPOV() == 180)
-        .whileTrue(new RunCommand(() -> shooterSub.runArm(-0.12), shooterSub));
+    new Trigger(() -> shooterXbox.getPOV() == 0)
+        .whileTrue(new RunCommand(() -> shooterSub.runArm(-0.4), shooterSub));
 
     // Left bumper: reverse intake (for clearing jams)
     new JoystickButton(shooterXbox, XboxController.Button.kLeftBumper.value)
@@ -187,13 +238,16 @@ public class RobotContainer {
     new JoystickButton(shooterXbox, XboxController.Button.kRightBumper.value)
         .whileTrue(new RunCommand(() -> shooterSub.runIntake(-0.8), shooterSub));
 
-    // Left trigger (>0.5): manual flywheel control (hold to run continuously)
+    // Left trigger (>0.5): spin up flywheel only (hold to run)
     new Trigger(() -> shooterXbox.getLeftTriggerAxis() > 0.5)
         .whileTrue(new RunCommand(() -> shooterSub.directRun(0.9), shooterSub));
 
-    // Right trigger (>0.5): shoot sequence (spin up, wait, then shoot)
+    // Right trigger (>0.5): run feeder + intake combo (hold to run)
     new Trigger(() -> shooterXbox.getRightTriggerAxis() > 0.5)
-        .whileTrue(new ShooterCommand(shooterSub, 0.8, 0.6, 0.5, true, false));
+        .whileTrue(Commands.runEnd(
+            () -> { shooterSub.runFeeder(-0.7); shooterSub.runIntake(-0.6); },
+            () -> { shooterSub.runFeeder(0); shooterSub.runIntake(0); },
+            shooterSub));
 
     // Left stick button: reverse feeder (for clearing jams)
     new JoystickButton(shooterXbox, XboxController.Button.kLeftStick.value)
@@ -214,6 +268,28 @@ public class RobotContainer {
 
   void acceptEstimatedRobotPose(Pose2d pose, double timestamp, Matrix<N3, N1> estimationStdDevs) {
     odomSub.addVisionMeasurement(pose, timestamp, estimationStdDevs);
+  }
+
+  void periodicAllianceUpdate() {
+    String selection = allianceChooser.getSelected();
+    if (selection == null) selection = "fms";
+    
+    // Set the cached alliance in driveSub based on dropdown
+    if (selection.equals("red")) {
+      driveSub.setAlliance(DriverStation.Alliance.Red);
+    } else if (selection.equals("blue")) {
+      driveSub.setAlliance(DriverStation.Alliance.Blue);
+    } else {
+      // "fms" - sync with actual FMS
+      var alliance = DriverStation.getAlliance();
+      if (alliance.isPresent()) {
+        driveSub.setAlliance(alliance.get());
+      }
+    }
+  }
+  
+  void updateAllianceCache() {
+    periodicAllianceUpdate();
   }
 
   public Command getAutonomousCommand() {

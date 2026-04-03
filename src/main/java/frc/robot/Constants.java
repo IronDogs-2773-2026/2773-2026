@@ -56,7 +56,7 @@ public class Constants {
   public static final double MaxRotationSpeed = 0.90;
   public static final double MaxTowerSpeed = 0.25;
   public static final double MaxAutoDriveSpeed = 0.3;
-  public static final double SlowdownFactor = 0.7;
+  public static final double SlowdownFactor = 0.6;
 
   public static final double ControllerDeadzone = 0.07;
   public static final double HOTASDeadzone = 0.1;
@@ -74,10 +74,10 @@ public class Constants {
   // Vision
   public static final String CameraName = "AprilCam";
   public static final Transform3d RobotToCam = new Transform3d(new Translation3d(0.01, 0.2, 1),
-      new Rotation3d(0, Math.PI/6, Math.PI));
+      new Rotation3d(0, Math.PI/12, Math.PI));
   public static final AprilTagFieldLayout TagLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
-  public static final Matrix<N3, N1> SingleTagStdDevs = VecBuilder.fill(0.1, 0.1, Math.toRadians(10));
-  public static final Matrix<N3, N1> MultiTagStdDevs = VecBuilder.fill(0.05, 0.05, Math.toRadians(5));
+  public static final Matrix<N3, N1> SingleTagStdDevs = VecBuilder.fill(0.2, 0.2, Math.toRadians(10));
+  public static final Matrix<N3, N1> MultiTagStdDevs = VecBuilder.fill(0.1, 0.1, Math.toRadians(5));
   public static final double BigNumber = 9999;
   public static final double MediumNumber = 9;
   public static final Vector<N3> MinVisionStdDevs = VecBuilder.fill(0.25, 0.25, Math.toRadians(10));

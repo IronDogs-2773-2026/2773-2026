@@ -3,14 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot.SwerveSubsystems;
 
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.Information.OdometrySubsystem;
+import java.util.Optional;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
@@ -18,6 +11,15 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.Information.OdometrySubsystem;
 
 public class DriveSubsystem extends SubsystemBase {
   public SwerveDriveModule blMotor = new SwerveDriveModule(Constants.backLeftModuleDriveCANID,
@@ -32,6 +34,7 @@ public class DriveSubsystem extends SubsystemBase {
   public double i = 0;
   public double d = 0;
   public PIDController pid = new PIDController(p, i, d);
+  private Optional<DriverStation.Alliance> alliance;
 
   // Swerve kinematics for converting ChassisSpeeds to module states
   public SwerveDriveKinematics kinematics = Constants.kinematics;
@@ -48,9 +51,14 @@ public class DriveSubsystem extends SubsystemBase {
 
   public SwerveDriveModule[] modules = { flMotor, frMotor, blMotor, brMotor };
 
+  /** Set cached alliance (for manual override) */
+  public void setAlliance(DriverStation.Alliance alliance) {
+    this.alliance = java.util.Optional.of(alliance);
+  }
+
   @Override
   public void periodic() {
-
+    alliance = DriverStation.getAlliance();
   }
 
   public void drive(double speed, double rotate) {
@@ -226,9 +234,19 @@ public class DriveSubsystem extends SubsystemBase {
         ),
         config,
         () -> {
-          // Flip paths for red alliance
-          var alliance = DriverStation.getAlliance();
-          return alliance.isPresent() ? alliance.get() == DriverStation.Alliance.Red : false;
+          // Get current FMS alliance
+          var currentAlliance = DriverStation.getAlliance();
+          
+          // Check if cached alliance differs from current (indicates manual override)
+          if (alliance.isPresent() && currentAlliance.isPresent()) {
+            if (alliance.get() != currentAlliance.get()) {
+              // Cached differs from FMS - manual override is active
+              return alliance.get() == DriverStation.Alliance.Red;
+            }
+          }
+          
+          // No override - use FMS
+          return currentAlliance.isPresent() && currentAlliance.get() == DriverStation.Alliance.Red;
         },
         this                                   // Reference to this subsystem
       );

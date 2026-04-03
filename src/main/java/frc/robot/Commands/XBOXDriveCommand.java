@@ -58,7 +58,7 @@ public class XBOXDriveCommand extends Command {
     buttonMicroCommands();
     
     // Check right trigger for slowdown mode
-    slowdownFactor = xbox.getRightTriggerAxis() > 0.5 ? Constants.SlowdownFactor : 1.0;
+    slowdownFactor = xbox.getRightTriggerAxis() > 0.5 ? Constants.SlowdownFactor : 0.9;
     
     double XAxis = -xbox.getLeftX(), YAxis = -xbox.getLeftY(), ZAxis = -xbox.getRightX();
     

@@ -9,14 +9,13 @@ import frc.robot.ShooterSubsystem;
 import frc.robot.Commands.ShootSequenceCommand;
 
 /**
- * Runs a shoot sequence with 15 second feed time.
- * Uses command composition to properly finish when the sequence completes.
+ * Runs a shoot sequence with 3 second feed time.
  */
-public class ShootSequence15 extends Command {
+public class ShootSequence3 extends Command {
   private final Command m_sequence;
 
-  public ShootSequence15(ShooterSubsystem shooterSub) {
-    m_sequence = new ShootSequenceCommand(shooterSub, 0.7, 0.6, 15, 1.5);
+  public ShootSequence3(ShooterSubsystem shooterSub) {
+    m_sequence = new ShootSequenceCommand(shooterSub, 0.7, 0.6, 3, 1.5);
     addRequirements(shooterSub);
   }
 

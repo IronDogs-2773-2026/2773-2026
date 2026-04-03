@@ -6,12 +6,12 @@ package frc.robot.Commands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.SwerveSubsystems.*;
-import frc.robot.Information.*;
 import frc.robot.Constants;
+import frc.robot.Information.OdometrySubsystem;
+import frc.robot.SwerveSubsystems.DriveSubsystem;
 
 public class XBOXDriveCommand extends Command {
   private final DriveSubsystem driveSubsystem;
@@ -21,7 +21,7 @@ public class XBOXDriveCommand extends Command {
   private final OdometrySubsystem odomSub;
   private PIDController pid;
   private PIDController rotPID;
-  double sensitivity = 0.5;
+  double sensitivity = 1;
 
   // For setpoint
   private boolean Rsetpoint = false;
@@ -60,8 +60,27 @@ public class XBOXDriveCommand extends Command {
     // Check right trigger for slowdown mode
     slowdownFactor = xbox.getRightTriggerAxis() > 0.5 ? Constants.SlowdownFactor : 1.0;
     
-    double XAxis = xbox.getLeftX(), YAxis = xbox.getLeftY(), ZAxis = -xbox.getRightX();
+    double XAxis = -xbox.getLeftX(), YAxis = -xbox.getLeftY(), ZAxis = -xbox.getRightX();
+    
+    // Calculate base angle from joystick
     double rawAngle = Math.atan2(YAxis, XAxis);
+    
+    // Apply 270° rotation offset (push forward = robot's forward)
+    // 90° for physical offset + 180° for additional inversion
+    rawAngle += Math.PI / 2;
+    
+    // Emergency 180° invert when both shooter sticks are pressed
+    // if (xbox2.getLeftStickButtonPressed() && xbox2.getRightStickButtonPressed()) {
+    //   driveHeadingOffset += Math.PI;
+    //   System.out.println("Emergency 180° Invert Triggered!");
+    // }
+    
+    // Flip 180° for red alliance so field-relative driving is consistent
+    var alliance = DriverStation.getAlliance();
+    if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
+      rawAngle += Math.PI;
+    }
+    
     double gyroAngle = odomSub.getGyroAngle() - driveHeadingOffset;
     if (xbox.getPOV() == 0) {
       sensitivity = MathUtil.clamp(0.05 + sensitivity, 0, 1);
@@ -138,6 +157,12 @@ public double povRotate() {
 
   public boolean buttonOnPress(int i) {
     return xbox.getRawButtonPressed(i);
+  }
+
+  /** Flip drive heading 180 degrees for emergency invert */
+  public void invertHeading() {
+    driveHeadingOffset += Math.PI;
+    System.out.println("Emergency 180° Invert Triggered!");
   }
 
   public double rotateAroundPoint(double rx, double ry) {

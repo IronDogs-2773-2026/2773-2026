@@ -1,7 +1,5 @@
 package frc.robot;
 
-import java.lang.reflect.Member;
-
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
@@ -13,9 +11,9 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.numbers.*;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 
 @SuppressWarnings({"ConstantName", "MemberName"})
 public class Constants {
@@ -54,8 +52,8 @@ public class Constants {
   public static final int backLeftModuleEncoderCANID = 54;
   public static final int backRightModuleEncoderCANID = 55;
 
-  public static final double MaxDriveSpeed = 0.6;
-  public static final double MaxRotationSpeed = 0.50;
+  public static final double MaxDriveSpeed = 0.8;
+  public static final double MaxRotationSpeed = 0.90;
   public static final double MaxTowerSpeed = 0.25;
   public static final double MaxAutoDriveSpeed = 0.3;
   public static final double SlowdownFactor = 0.7;

@@ -13,13 +13,26 @@
         {
           "type": "named",
           "data": {
-            "name": "Intake 5"
+            "name": "Lower Arm"
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "Collect my Balls"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake 5"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Collect my Balls"
+                }
+              }
+            ]
           }
         },
         {

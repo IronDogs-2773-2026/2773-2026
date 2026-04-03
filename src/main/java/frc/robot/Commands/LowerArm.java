@@ -39,7 +39,7 @@ public class LowerArm extends Command {
 
     if (isPulsing) {
       // Pulse arm motor for 0.5 seconds
-      shooterSub.runArm(0.5);
+      shooterSub.runArm(0.1);
       if (elapsedTime >= 0.5) {
         isPulsing = false;
         startTime = currentTime;

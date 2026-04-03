@@ -17,6 +17,24 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants;
 
+/**
+ * Shooter subsystem controlling the flywheel, feeder, arm, and intake mechanisms.
+ * 
+ * <p>This subsystem manages five motors:
+ * <ul>
+ *   <li><b>Flywheel 1 & 2</b> — Counter-rotating flywheel motors for launching game pieces.
+ *       Motor 2 follows Motor 1 in inverted mode for opposite rotation.</li>
+ *   <li><b>Feeder Motor</b> — Pushes game pieces from the intake into the flywheel.</li>
+ *   <li><b>Arm Motor</b> — Adjusts the shooter arm angle for different shot distances.</li>
+ *   <li><b>Intake Motor</b> — Pulls game pieces into the robot from the field.</li>
+ * </ul>
+ * 
+ * <p>Flywheel control supports two modes:
+ * <ul>
+ *   <li><b>Direct (open-loop)</b> — Set motor speed directly via {@link #directRun(double)}</li>
+ *   <li><b>PID (closed-loop)</b> — Target RPM via {@link #pidRun(double)} using encoder feedback</li>
+ * </ul>
+ */
 public class ShooterSubsystem extends SubsystemBase {
   private SparkMax flyWheelOne = new SparkMax(Constants.flyWheel1, MotorType.kBrushless);
   private SparkMax flyWheelTwo = new SparkMax(Constants.flyWheel2, MotorType.kBrushless);
@@ -61,8 +79,10 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   /**
-   * Direct run function to set flywheel speed directly
-   * @param speed Speed from -1.0 to 1.0
+   * Directly sets the flywheel motor speed (open-loop control).
+   * Only motor 1 is driven; motor 2 follows as a follower.
+   * 
+   * @param speed Motor speed from -1.0 (full reverse) to 1.0 (full forward)
    */
   public void directRun(double speed) {
     // Only run one flywheel motor
@@ -70,8 +90,10 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   /**
-   * PID run function to reach target velocity
-   * @param targetRPM Target velocity in RPM
+   * Runs the flywheel motors to a target RPM using PID control.
+   * Averages both flywheel encoder readings for accurate speed feedback.
+   * 
+   * @param targetRPM Target flywheel velocity in RPM
    */
   public void pidRun(double targetRPM) {
     // Average both flywheel encoders for accurate speed reading
@@ -84,7 +106,7 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   /**
-   * Stop all shooter motors
+   * Stops all shooter motors (flywheel, feeder, arm, intake).
    */
   public void stop() {
     flyWheelOne.set(0);
@@ -95,17 +117,28 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   /**
-   * Run the feeder motor
-   * @param speed Speed from -1.0 to 1.0
+   * Sets the feeder motor speed.
+   * 
+   * @param speed Motor speed from -1.0 (full reverse) to 1.0 (full forward)
    */
   public void runFeeder(double speed) {
     feederMotor.set(speed);
   }
 
+  /**
+   * Sets the arm motor speed.
+   * 
+   * @param speed Motor speed from -1.0 (full reverse) to 1.0 (full forward)
+   */
   public void runArm(double speed) {
     armMotor.set(speed);
   }
 
+  /**
+   * Sets the intake motor speed.
+   * 
+   * @param speed Motor speed from -1.0 (full reverse) to 1.0 (full forward)
+   */
   public void runIntake(double speed) {
     intakeMotor.set(speed);
   }
@@ -119,8 +152,9 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   /**
-   * Check if flywheels are at target speed
-   * @return true if within tolerance
+   * Checks if the flywheel motors have reached the target PID setpoint.
+   * 
+   * @return true if within the configured PID tolerance (±50 RPM)
    */
   public boolean atSetpoint() {
     return pidController.atSetpoint();

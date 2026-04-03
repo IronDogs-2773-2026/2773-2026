@@ -10,10 +10,17 @@ import frc.robot.Commands.ShootSequenceCommand;
 
 /**
  * Runs a shoot sequence with 3 second feed time.
+ * Flywheel: 0.7, Feeder: 0.6, Spinup: 1.5s, Feed: 3s.
+ * Registered as NamedCommand "Shoot Sequence 3" for PathPlanner.
  */
 public class ShootSequence3 extends Command {
   private final Command m_sequence;
 
+  /**
+   * Constructs the ShootSequence3 command.
+   * 
+   * @param shooterSub Shooter subsystem
+   */
   public ShootSequence3(ShooterSubsystem shooterSub) {
     m_sequence = new ShootSequenceCommand(shooterSub, 0.7, 0.6, 3, 1.5);
     addRequirements(shooterSub);

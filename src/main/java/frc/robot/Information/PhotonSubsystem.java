@@ -38,8 +38,21 @@ import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.Information.VisionSubsystem.EstimateConsumer;
 
+/**
+ * Alternative PhotonVision subsystem for AprilTag-based pose estimation.
+ * 
+ * <p>Currently not used — {@link VisionSubsystem} is the active vision system.
+ * Uses lowest-ambiguity pose strategy with dynamic standard deviation adjustment
+ * based on tag count and average distance.
+ * 
+ * <p>Provides:
+ * <ul>
+ *   <li>{@link #getPose2d()} — Latest estimated robot pose</li>
+ *   <li>{@link #getStdDevs()} — Current estimation confidence</li>
+ *   <li>{@link #getPhotonTimestamp()} — Timestamp of last valid estimate</li>
+ * </ul>
+ */
 public class PhotonSubsystem extends SubsystemBase {
-  /** Creates a new PhotonSubsystem. */
 
   private Matrix<N3, N1> curStdDevs = Constants.SingleTagStdDevs;
   private final PhotonPoseEstimator m_photonEstimator;

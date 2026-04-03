@@ -9,14 +9,17 @@ import frc.robot.ShooterSubsystem;
 
 /**
  * Command to run the feeder motor at a constant speed.
+ * Stops automatically when the command ends.
  */
 public class RunFeederCommand extends Command {
   private final ShooterSubsystem shooterSub;
   private final double speed;
 
   /**
+   * Constructs the RunFeederCommand.
+   * 
    * @param shooterSub Shooter subsystem
-   * @param speed Feeder speed (0 to 1), positive shoots, negative intakes
+   * @param speed Feeder speed (-1.0 to 1.0), positive shoots, negative intakes
    */
   public RunFeederCommand(ShooterSubsystem shooterSub, double speed) {
     this.shooterSub = shooterSub;

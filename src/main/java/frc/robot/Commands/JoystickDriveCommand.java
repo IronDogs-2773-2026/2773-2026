@@ -12,7 +12,16 @@ import frc.robot.Constants;
 import frc.robot.Information.OdometrySubsystem;
 import frc.robot.SwerveSubsystems.DriveSubsystem;
 
-/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
+/**
+ * Alternative drive command using a Logitech Joystick (HOTAS).
+ * 
+ * <p>Currently not used — {@link XBOXDriveCommand} is the default.
+ * Uses PID-based drive speed calculation from encoder feedback.
+ * 
+ * <p><b>Warning:</b> This command calls {@code odomSub.resetGyro()} at init,
+ * which resets the NavX gyro to zero. This can desync the pose estimator
+ * if called mid-match.
+ */
 public class JoystickDriveCommand extends Command {
   private final DriveSubsystem driveSub;
   private final Joystick joystick;
@@ -20,7 +29,13 @@ public class JoystickDriveCommand extends Command {
   private final PIDController pid;
   private final PIDController rotPid;
 
-  /** Creates a new JoystickDriveCommand. */
+  /**
+   * Constructs the JoystickDriveCommand.
+   * 
+   * @param driveSub The drive subsystem to control
+   * @param joystick The HOTAS joystick
+   * @param odomSub The odometry subsystem for gyro and pose data
+   */
   public JoystickDriveCommand(DriveSubsystem driveSub, Joystick joystick, OdometrySubsystem odomSub) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.driveSub = driveSub;

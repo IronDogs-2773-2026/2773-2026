@@ -8,11 +8,28 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.ShooterSubsystem;
 
-/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
+/**
+ * Default command for the shooter subsystem providing axis-based manual control.
+ * 
+ * <p>Controls (shooter operator Xbox controller):
+ * <ul>
+ *   <li><b>Left Y Axis</b> — Flywheel speed</li>
+ *   <li><b>Left X Axis</b> — Feeder speed</li>
+ *   <li><b>Right X Axis</b> — Intake speed</li>
+ * </ul>
+ * 
+ * <p>This command runs continuously and is overridden by button-triggered commands.
+ */
 public class ShooterDefaultCommand extends Command {
   private ShooterSubsystem shoot;
   private XboxController xbox;
-  /** Creates a new ShooterDefaultCommand. */
+
+  /**
+   * Constructs the ShooterDefaultCommand.
+   * 
+   * @param shoot Shooter subsystem
+   * @param xbox Shooter operator Xbox controller
+   */
   public ShooterDefaultCommand(ShooterSubsystem shoot, XboxController xbox) {
     this.shoot = shoot;
     this.xbox = xbox;

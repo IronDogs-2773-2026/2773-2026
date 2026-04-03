@@ -10,11 +10,17 @@ import frc.robot.Commands.ShootSequenceCommand;
 
 /**
  * Runs a shoot sequence with 5 second feed time.
- * Uses command composition to properly finish when the sequence completes.
+ * Flywheel: 0.7, Feeder: 0.6, Spinup: 1.5s, Feed: 5s.
+ * Registered as NamedCommand "Shoot Sequence 5" for PathPlanner.
  */
 public class ShootSequence5 extends Command {
   private final Command m_sequence;
 
+  /**
+   * Constructs the ShootSequence5 command.
+   * 
+   * @param shooterSub Shooter subsystem
+   */
   public ShootSequence5(ShooterSubsystem shooterSub) {
     m_sequence = new ShootSequenceCommand(shooterSub, 0.7, 0.6, 5, 1.5);
     addRequirements(shooterSub);

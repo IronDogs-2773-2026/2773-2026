@@ -21,24 +21,55 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Information.OdometrySubsystem;
 
+/**
+ * Swerve drive subsystem controlling four MAXSwerve modules.
+ * 
+ * <p>Each module consists of a NEO drive motor, a NEO rotation (steering) motor,
+ * and a CTRE CANCoder for absolute steering position. Module angle offsets are
+ * calibrated at construction time.
+ * 
+ * <p>Drive modes supported:
+ * <ul>
+ *   <li><b>directionalDrive</b> — Polar coordinate drive (speed + angle + rotation)</li>
+ *   <li><b>driveRobotRelative</b> — ChassisSpeeds-based drive (for PathPlanner)</li>
+ *   <li><b>carDrive</b> — Ackermann-style curved driving (deprecated)</li>
+ * </ul>
+ */
 public class DriveSubsystem extends SubsystemBase {
+  /** Back-left swerve module. */
   public SwerveDriveModule blMotor = new SwerveDriveModule(Constants.backLeftModuleDriveCANID,
       Constants.backLeftModuleRotateCANID, Constants.backLeftModuleEncoderCANID, 0.3686);
+
+  /** Back-right swerve module. */
   public SwerveDriveModule brMotor = new SwerveDriveModule(Constants.backRightModuleDriveCANID,
       Constants.backRightModuleRotateCANID, Constants.backRightModuleEncoderCANID, -0.1597);
+
+  /** Front-right swerve module. */
   public SwerveDriveModule frMotor = new SwerveDriveModule(Constants.frontRightModuleDriveCANID,
       Constants.frontRightModuleRotateCANID, Constants.frontRightModuleEncoderCANID, -0.48657);
+
+  /** Front-left swerve module. */
   public SwerveDriveModule flMotor = new SwerveDriveModule(Constants.frontLeftModuleDriveCANID,
       Constants.frontLeftModuleRotateCANID, Constants.frontLeftModuleEncoderCANID, 0.35522);
+
+  /** PID controller for drive speed (currently unused). */
   public double p = 0.63;
   public double i = 0;
   public double d = 0;
   public PIDController pid = new PIDController(p, i, d);
+
+  /** Cached alliance state (updated every periodic cycle from FMS). */
   private Optional<DriverStation.Alliance> alliance;
 
-  // Swerve kinematics for converting ChassisSpeeds to module states
+  /** Swerve kinematics for converting ChassisSpeeds to module states. */
   public SwerveDriveKinematics kinematics = Constants.kinematics;
 
+  /**
+   * Returns the current position of all four swerve modules.
+   * Order: [front-left, front-right, back-left, back-right]
+   * 
+   * @return Array of SwerveModulePosition for odometry updates
+   */
   public SwerveModulePosition[] getPositions() {
     return new SwerveModulePosition[] {
         flMotor.getSwervePosition(), frMotor.getSwervePosition(),
@@ -51,7 +82,11 @@ public class DriveSubsystem extends SubsystemBase {
 
   public SwerveDriveModule[] modules = { flMotor, frMotor, blMotor, brMotor };
 
-  /** Set cached alliance (for manual override) */
+  /**
+   * Sets the cached alliance state for manual override.
+   * 
+   * @param alliance The alliance to cache (Blue or Red)
+   */
   public void setAlliance(DriverStation.Alliance alliance) {
     this.alliance = java.util.Optional.of(alliance);
   }
@@ -61,6 +96,13 @@ public class DriveSubsystem extends SubsystemBase {
     alliance = DriverStation.getAlliance();
   }
 
+  /**
+   * Drives all modules in a straight line (tank-style, no rotation).
+   * 
+   * @param speed Drive speed (-1.0 to 1.0)
+   * @param rotate Rotation factor (unused in this mode)
+   * @deprecated Use {@link #directionalDrive(double, double, double)} instead
+   */
   public void drive(double speed, double rotate) {
     blMotor.drive(speed, rotate);
     brMotor.drive(speed, rotate);
@@ -68,6 +110,14 @@ public class DriveSubsystem extends SubsystemBase {
     flMotor.drive(speed, rotate);
   }
 
+  /**
+   * Drives the robot in a specified direction with optional rotation.
+   * Each module is oriented to the given angle and driven at the given speed,
+   * with rotation vectors added to each module based on its position.
+   * 
+   * @param speed Drive speed (0.0 to 1.0)
+   * @param angle Drive direction in radians (field-relative)
+   */
   public void directionalDrive(double speed, double angle) {
     blMotor.directionalDrive(speed, angle);
     brMotor.directionalDrive(speed, angle);
@@ -109,6 +159,14 @@ public class DriveSubsystem extends SubsystemBase {
     }
   }
 
+  /**
+   * Drives the robot with full field-relative control: translation speed, direction, and rotation.
+   * Uses vector addition to combine translation and rotation components for each module.
+   * 
+   * @param speed Translation speed (0.0 to 1.0)
+   * @param angle Translation direction in radians (field-relative)
+   * @param rotation Rotation speed (-1.0 to 1.0), positive = counter-clockwise
+   */
   public void directionalDrive(double speed, double angle, double rotation) {
     Vec bl = new Vec(speed, angle).add(new Vec(rotation, -3 * Math.PI / 4));
     Vec br = new Vec(speed, angle).add(new Vec(rotation, 3 * Math.PI / 4));
@@ -120,6 +178,9 @@ public class DriveSubsystem extends SubsystemBase {
     flMotor.directionalDrive(fl.r, fl.phi);
   }
 
+  /**
+   * Stops all four swerve modules.
+   */
   public void stop() {
     blMotor.stop();
     brMotor.stop();
@@ -127,6 +188,11 @@ public class DriveSubsystem extends SubsystemBase {
     flMotor.stop();
   }
 
+  /**
+   * Rotates the robot in place (all modules oriented for pure rotation).
+   * 
+   * @param speed Rotation speed (-1.0 to 1.0), positive = counter-clockwise
+   */
   public void rotate(double speed) {
     frMotor.directionalDrive(speed, Math.PI / 4);
     brMotor.directionalDrive(speed, 3 * Math.PI / 4);
@@ -165,15 +231,32 @@ public class DriveSubsystem extends SubsystemBase {
     flMotor.directionalDrive(kl * speed, flAngle);
   }
 
+  /**
+   * Returns the drive PID controller.
+   * 
+   * @return The PIDController used for drive speed control
+   */
   public PIDController getPID() {
     return pid;
   }
 
+  /**
+   * Returns the average distance traveled by all four drive modules.
+   * Used for PID-based drive speed control.
+   * 
+   * @return Average encoder distance across all modules
+   */
   public double averageDistanceEncoder() {
     return (flMotor.distanceEncoderPosition() + frMotor.distanceEncoderPosition() + blMotor.distanceEncoderPosition()
         + brMotor.distanceEncoderPosition()) / 4;
   }
 
+  /**
+   * Returns the current state of all four swerve modules.
+   * Order: [front-left, front-right, back-left, back-right]
+   * 
+   * @return Array of SwerveModuleState for kinematics calculations
+   */
   public SwerveModuleState[] getStates() {
     return new SwerveModuleState[] {
         flMotor.getSwerveState(),
@@ -184,14 +267,19 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /**
-   * Get current robot-relative chassis speeds from module states
+   * Converts current module states to robot-relative chassis speeds.
+   * 
+   * @return ChassisSpeeds with vx, vy (m/s) and omega (rad/s) relative to robot frame
    */
   public ChassisSpeeds getRobotRelativeSpeeds() {
     return kinematics.toChassisSpeeds(getStates());
   }
 
   /**
-   * Drive using robot-relative ChassisSpeeds (required for PathPlanner)
+   * Drives the robot using robot-relative ChassisSpeeds.
+   * Required for PathPlanner AutoBuilder integration.
+   * 
+   * @param robotRelativeSpeeds Target chassis speeds (vx, vy in m/s, omega in rad/s)
    */
   public void driveRobotRelative(ChassisSpeeds robotRelativeSpeeds) {
     // Convert ChassisSpeeds to SwerveModuleStates
@@ -208,8 +296,19 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /**
-   * Initialize AutoBuilder for PathPlanner
-   * Call this after OdometrySubsystem is created
+   * Initializes PathPlanner AutoBuilder with this subsystem's configuration.
+   * Must be called after OdometrySubsystem is created.
+   * 
+   * <p>Configures:
+   * <ul>
+   *   <li>Pose supplier and reset consumer for odometry</li>
+   *   <li>Robot-relative speed supplier and drive consumer</li>
+   *   <li>Holonomic drive controller with translation/rotation PID constants</li>
+   *   <li>RobotConfig from PathPlanner GUI settings</li>
+   *   <li>Alliance supplier for automatic path mirroring</li>
+   * </ul>
+   * 
+   * @param odomSub The odometry subsystem for pose tracking
    */
   public void initAutoBuilder(OdometrySubsystem odomSub) {
     System.out.println("DriveSubsystem: Starting AutoBuilder initialization...");

@@ -16,7 +16,23 @@ import frc.robot.Constants;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.RelativeEncoder;
 
-/** Add your docs here. */
+/**
+ * Represents a single MAXSwerve drive module.
+ * 
+ * <p>Each module consists of:
+ * <ul>
+ *   <li>A NEO drive motor (SparkMax) for wheel speed</li>
+ *   <li>A NEO rotation/steering motor (SparkMax) for wheel angle</li>
+ *   <li>A CTRE CANCoder for absolute steering position</li>
+ *   <li>A relative encoder on the drive motor for distance tracking</li>
+ * </ul>
+ * 
+ * <p>Supports two drive modes:
+ * <ul>
+ *   <li>{@link #directionalDrive(double, double)} — Polar coordinate drive (speed + angle)</li>
+ *   <li>{@link #setDesiredState(SwerveModuleState)} — WPILib SwerveModuleState-based control</li>
+ * </ul>
+ */
 public class SwerveDriveModule {
   
   // Variables O:

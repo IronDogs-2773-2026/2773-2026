@@ -10,6 +10,9 @@ import frc.robot.ShooterSubsystem;
 /**
  * Command that pulses the arm motor for 0.5 seconds three times
  * with 0.5 second breaks in between.
+ * 
+ * <p>Used in PathPlanner autonomous routines to lower the shooter arm
+ * to a known position before shooting. Total duration: ~3 seconds.
  */
 public class LowerArm extends Command {
   private final ShooterSubsystem shooterSub;
@@ -18,6 +21,8 @@ public class LowerArm extends Command {
   private boolean isPulsing = true;
 
   /**
+   * Constructs the LowerArm command.
+   * 
    * @param shooterSub Shooter subsystem
    */
   public LowerArm(ShooterSubsystem shooterSub) {

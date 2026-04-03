@@ -10,18 +10,29 @@ import frc.robot.ShooterSubsystem;
 
 /**
  * One-button shoot sequence command.
- * Spins up flywheel, waits, then runs feeder to shoot.
+ * 
+ * <p>Executes the following sequence:
+ * <ol>
+ *   <li>Spin up flywheel to target speed</li>
+ *   <li>Wait for spinup duration</li>
+ *   <li>Run feeder to shoot game piece</li>
+ *   <li>Stop all shooter motors</li>
+ * </ol>
+ * 
+ * <p>Used for both teleop (right trigger) and PathPlanner named commands.
  */
 public class ShootSequenceCommand extends Command {
   private final Command sequence;
   private final double spinupTime;
 
   /**
-   * @param shooterSub  Shooter subsystem
+   * Constructs the ShootSequenceCommand.
+   * 
+   * @param shooterSub Shooter subsystem
    * @param flywheelSpeed Flywheel speed (-1.0 to 1.0)
-   * @param feederSpeed Feeder speed (0 to 1)
-   * @param shootTime   How long to run feeder in seconds
-   * @param spinupTime  How long to wait before feeding (seconds)
+   * @param feederSpeed Feeder speed (-1.0 to 1.0)
+   * @param shootTime How long to run feeder in seconds
+   * @param spinupTime How long to wait before feeding (seconds)
    */
   public ShootSequenceCommand(ShooterSubsystem shooterSub, double flywheelSpeed, double feederSpeed, double shootTime, double spinupTime) {
     this.spinupTime = spinupTime;

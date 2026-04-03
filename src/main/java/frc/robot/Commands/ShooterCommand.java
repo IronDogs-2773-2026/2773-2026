@@ -9,17 +9,29 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.ShooterSubsystem;
 
 /**
- * Command to run the shooter flywheel at a set speed using direct (open-loop) control.
- * Once at speed, optionally runs the feeder to shoot notes.
+ * Command to run the shooter flywheel and optionally the feeder/intake.
+ * 
+ * <p>Sequence:
+ * <ol>
+ *   <li>Spin up flywheel to target speed</li>
+ *   <li>Wait 1.5 seconds for flywheel to reach speed</li>
+ *   <li>If {@code useFeederIntake} is true, run feeder and intake motors</li>
+ * </ol>
+ * 
+ * <p>Used for teleop right trigger (hold to run continuously).
+ * Motors stop automatically when the command is interrupted.
  */
 public class ShooterCommand extends SequentialCommandGroup {
 
   /**
-   * @param shooterSub    Shooter subsystem
+   * Constructs the ShooterCommand.
+   * 
+   * @param shooterSub Shooter subsystem
    * @param flywheelSpeed Flywheel speed (-1.0 to 1.0)
-   * @param feederSpeed   Feeder speed (0 to 1), or 0 to disable
-   * @param useFeederIntake if true, runs feeder after spinup delay
-   * @param pidRun        If true, use PID control; if false, use direct control
+   * @param feederSpeed Feeder speed (0 to 1), or 0 to disable
+   * @param intakeSpeed Intake speed (0 to 1), or 0 to disable
+   * @param useFeederIntake If true, runs feeder after spinup delay
+   * @param pidRun If true, use PID control; if false, use direct control (currently unused)
    */
   public ShooterCommand(ShooterSubsystem shooterSub, double flywheelSpeed, double feederSpeed, double intakeSpeed, boolean useFeederIntake, boolean pidRun) {
     // Build the sequence: spin up → wait → shoot (if enabled)

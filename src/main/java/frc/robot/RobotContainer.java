@@ -35,7 +35,6 @@ import frc.robot.Commands.Intake3;
 import frc.robot.Commands.Intake5;
 import frc.robot.Commands.Intake7;
 import frc.robot.Commands.LowerArm;
-import frc.robot.Commands.RunFeederCommand;
 import frc.robot.Commands.ShootSequenceCommand;
 import frc.robot.Commands.ShooterDefaultCommand;
 import frc.robot.Commands.XBOXDriveCommand;
@@ -43,27 +42,104 @@ import frc.robot.Information.OdometrySubsystem;
 import frc.robot.Information.VisionSubsystem;
 import frc.robot.SwerveSubsystems.DriveSubsystem;
 
+/**
+ * Main robot configuration class.
+ * 
+ * <p>This class is responsible for:
+ * <ul>
+ *   <li>Initializing all subsystems and controllers</li>
+ *   <li>Configuring PathPlanner AutoBuilder and autonomous routines</li>
+ *   <li>Registering NamedCommands for use in PathPlanner autos</li>
+ *   <li>Binding driver and operator controls to commands</li>
+ *   <li>Managing alliance selection (FMS or manual override)</li>
+ * </ul>
+ * 
+ * <h3>Controller Layout:</h3>
+ * <h4>Driver (Xbox Controller, Port 0)</h4>
+ * <table>
+ *   <tr><th>Input</th><th>Action</th></tr>
+ *   <tr><td>Left Stick</td><td>Field-relative translation</td></tr>
+ *   <tr><td>Right Stick</td><td>Field-relative rotation</td></tr>
+ *   <tr><td>Right Trigger &gt; 0.5</td><td>Slowdown mode (0.6x speed)</td></tr>
+ *   <tr><td>POV Up/Down</td><td>Adjust drive sensitivity</td></tr>
+ *   <tr><td>B Button</td><td>Emergency 180° heading invert</td></tr>
+ *   <tr><td>Buttons 7+8</td><td>Reset gyro heading offset</td></tr>
+ * </table>
+ * 
+ * <h4>Shooter Operator (Xbox Controller, Port 2)</h4>
+ * <table>
+ *   <tr><th>Input</th><th>Action</th></tr>
+ *   <tr><td>Left Trigger &gt; 0.5</td><td>Spin up flywheel (hold)</td></tr>
+ *   <tr><td>Right Trigger &gt; 0.5</td><td>Run feeder + intake combo (hold)</td></tr>
+ *   <tr><td>A Button</td><td>Toggle "Wyatt is Dumb" dashboard boolean</td></tr>
+ *   <tr><td>B Button</td><td>Stop all shooter motors</td></tr>
+ *   <tr><td>POV Up</td><td>Run arm up (hold)</td></tr>
+ *   <tr><td>POV Down</td><td>Run arm down (hold)</td></tr>
+ *   <tr><td>Left Bumper</td><td>Reverse intake (clear jams)</td></tr>
+ *   <tr><td>Right Bumper</td><td>Run intake (hold)</td></tr>
+ *   <tr><td>Left Stick</td><td>Reverse feeder (clear jams)</td></tr>
+ *   <tr><td>Right Stick</td><td>Fast feeder (rapid shooting)</td></tr>
+ *   <tr><td>Start</td><td>Zero arm position (calibration)</td></tr>
+ *   <tr><td>Back</td><td>Toggle PID mode (logs to console)</td></tr>
+ * </table>
+ * 
+ * <h3>Autonomous Routines:</h3>
+ * <ul>
+ *   <li>"Gunner's Auto" (default)</li>
+ *   <li>"revised gunner auto"</li>
+ *   <li>"noah auto"</li>
+ *   <li>"Leftside Neutral Auto"</li>
+ *   <li>"Simple Shoot" (non-PathPlanner, shoot-only routine)</li>
+ * </ul>
+ * 
+ * <h3>NamedCommands (for PathPlanner):</h3>
+ * <ul>
+ *   <li>Shoot Sequence 1/2/3/5/10/15 — flywheel spinup + feed for N seconds</li>
+ *   <li>Intake 1/2/3/5/7/10 — run intake at -0.5 for N seconds</li>
+ *   <li>Lower Arm — pulse arm motor 3x (0.5s on/off)</li>
+ * </ul>
+ */
 public class RobotContainer {
-  // Autonomous chooser
+  /** Dashboard chooser for selecting autonomous routines. */
   private SendableChooser<Command> autoChooser;
-  
-  // Alliance selector dropdown
+
+  /** Dashboard chooser for alliance selection (FMS, Force Blue, Force Red). */
   private SendableChooser<String> allianceChooser;
 
-  // Controllers
+  /** Driver Xbox controller (port 0). */
   XboxController xbox = new XboxController(0);
+
+  /** Shooter operator Xbox controller (port 2). */
   XboxController shooterXbox = new XboxController(2);
 
-  // Subsystems
+  /** Swerve drive subsystem. */
   DriveSubsystem driveSub = new DriveSubsystem();
+
+  /** Odometry subsystem with NavX gyro and pose estimation. */
   OdometrySubsystem odomSub = new OdometrySubsystem(driveSub);
+
+  /** Vision subsystem for AprilTag pose estimation. */
   VisionSubsystem visionSub = new VisionSubsystem(this::acceptEstimatedRobotPose);
+
+  /** Shooter subsystem (flywheel, feeder, arm, intake). */
   ShooterSubsystem shooterSub = new ShooterSubsystem();
 
-  // Commands from files
+  /** Default drive command for teleop (field-relative XBOX control). */
   XBOXDriveCommand driveCommand = new XBOXDriveCommand(driveSub, xbox, odomSub);
   // JoystickDriveCommand jdriveCommand = new JoystickDriveCommand(driveSub, joystick, odomSub);
 
+  /**
+   * Constructs the RobotContainer and initializes all subsystems, commands, and bindings.
+   * 
+   * <p>This constructor is called once during robot initialization and performs:
+   * <ul>
+   *   <li>PathPlanner AutoBuilder configuration</li>
+   *   <li>Autonomous routine loading and chooser setup</li>
+   *   <li>Alliance selector dashboard widget</li>
+   *   <li>NamedCommand registration for PathPlanner</li>
+   *   <li>Driver and operator control bindings</li>
+   * </ul>
+   */
   public RobotContainer() {
     System.out.println("RobotContainer: Initializing AutoBuilder...");
 
@@ -119,6 +195,33 @@ public class RobotContainer {
       System.out.println("RobotContainer: SUCCESS - Added 'noah auto' to chooser");
     } catch (Exception e) {
       System.err.println("FAILED to load 'noah auto': " + e.getMessage());
+      e.printStackTrace();
+    }
+
+    // Add "Leftside Neutral Auto" full autonomous routine
+    try {
+      autoChooser.addOption("Leftside Neutral Auto", AutoBuilder.buildAuto("Leftside Neutral Auto"));
+      System.out.println("RobotContainer: SUCCESS - Added 'Leftside Neutral Auto' to chooser");
+    } catch (Exception e) {
+      System.err.println("FAILED to load 'Leftside Neutral Auto': " + e.getMessage());
+      e.printStackTrace();
+    }
+
+    // Add "bump and shoot" full autonomous routine
+    try {
+      autoChooser.addOption("bump and shoot", AutoBuilder.buildAuto("bump and shoot"));
+      System.out.println("RobotContainer: SUCCESS - Added 'bump and shoot' to chooser");
+    } catch (Exception e) {
+      System.err.println("FAILED to load 'bump and shoot': " + e.getMessage());
+      e.printStackTrace();
+    }
+
+    // Add "Do Not Use" full autonomous routine
+    try {
+      autoChooser.addOption("Do Not Use", AutoBuilder.buildAuto("Do Not Use"));
+      System.out.println("RobotContainer: SUCCESS - Added 'Do Not Use' to chooser");
+    } catch (Exception e) {
+      System.err.println("FAILED to load 'Do Not Use': " + e.getMessage());
       e.printStackTrace();
     }
 
@@ -216,7 +319,8 @@ public class RobotContainer {
 
     // A button: run feeder only (for testing/intake)
     new JoystickButton(shooterXbox, XboxController.Button.kA.value)
-        .whileTrue(new RunFeederCommand(shooterSub, -0.7));
+        .whileTrue(new RunCommand(() -> SmartDashboard.putBoolean("Wyatt is Dumb", true))
+            .finallyDo(() -> SmartDashboard.putBoolean("Wyatt is Dumb", false)));
 
     // B button: stop all shooter motors
     new JoystickButton(shooterXbox, XboxController.Button.kB.value)
@@ -230,24 +334,30 @@ public class RobotContainer {
     new Trigger(() -> shooterXbox.getPOV() == 0)
         .whileTrue(new RunCommand(() -> shooterSub.runArm(-0.4), shooterSub));
 
-    // Left bumper: reverse intake (for clearing jams)
+    // Left bumper: reverse intake + feeder + flywheel outtake (for clearing jams)
     new JoystickButton(shooterXbox, XboxController.Button.kLeftBumper.value)
-        .whileTrue(new RunCommand(() -> shooterSub.runIntake(0.5), shooterSub));
+        .whileTrue(new RunCommand(() -> {
+            shooterSub.runIntake(0.5);
+            shooterSub.runFeeder(0.5);
+        }, shooterSub).finallyDo(() -> {
+            shooterSub.runIntake(0);
+            shooterSub.runFeeder(0);
+        }));
 
     // Right bumper: run intake (hold to intake)
     new JoystickButton(shooterXbox, XboxController.Button.kRightBumper.value)
-        .whileTrue(new RunCommand(() -> shooterSub.runIntake(-0.8), shooterSub));
+        .whileTrue(new RunCommand(() -> shooterSub.runIntake(-0.9), shooterSub));
 
     // Left trigger (>0.5): spin up flywheel only (hold to run)
     new Trigger(() -> shooterXbox.getLeftTriggerAxis() > 0.5)
         .whileTrue(new RunCommand(() -> shooterSub.directRun(0.9), shooterSub));
 
     // Right trigger (>0.5): run feeder + intake combo (hold to run)
+    // No subsystem requirement so it can run alongside left trigger flywheel
     new Trigger(() -> shooterXbox.getRightTriggerAxis() > 0.5)
         .whileTrue(Commands.runEnd(
             () -> { shooterSub.runFeeder(-0.7); shooterSub.runIntake(-0.6); },
-            () -> { shooterSub.runFeeder(0); shooterSub.runIntake(0); },
-            shooterSub));
+            () -> { shooterSub.runFeeder(0); shooterSub.runIntake(0); }));
 
     // Left stick button: reverse feeder (for clearing jams)
     new JoystickButton(shooterXbox, XboxController.Button.kLeftStick.value)
@@ -266,10 +376,26 @@ public class RobotContainer {
         .onTrue(new RunCommand(() -> System.out.println("PID mode toggled"), shooterSub));
   }
 
+  /**
+   * Callback for vision subsystem to add pose measurements to odometry.
+   * 
+   * @param pose The estimated robot pose from vision processing
+   * @param timestamp The FPGA timestamp of the measurement
+   * @param estimationStdDevs Standard deviations of the pose estimate (3x1 vector)
+   */
   void acceptEstimatedRobotPose(Pose2d pose, double timestamp, Matrix<N3, N1> estimationStdDevs) {
     odomSub.addVisionMeasurement(pose, timestamp, estimationStdDevs);
   }
 
+  /**
+   * Updates the alliance cache in the drive subsystem based on the dashboard selector.
+   * 
+   * <p>Priority order:
+   * <ol>
+   *   <li>Manual override ("Force Blue" or "Force Red")</li>
+   *   <li>FMS-reported alliance (if available)</li>
+   * </ol>
+   */
   void periodicAllianceUpdate() {
     String selection = allianceChooser.getSelected();
     if (selection == null) selection = "fms";
@@ -288,10 +414,21 @@ public class RobotContainer {
     }
   }
   
+  /**
+   * Called every robot periodic cycle to refresh the alliance cache from FMS.
+   * 
+   * <p>This is invoked from {@code Robot.robotPeriodic()} to ensure the drive
+   * subsystem's alliance state stays synchronized with the current match.
+   */
   void updateAllianceCache() {
     periodicAllianceUpdate();
   }
 
+  /**
+   * Returns the currently selected autonomous command.
+   * 
+   * @return The command selected on the dashboard AutoChooser, or null if none selected
+   */
   public Command getAutonomousCommand() {
     return autoChooser.getSelected();
   }

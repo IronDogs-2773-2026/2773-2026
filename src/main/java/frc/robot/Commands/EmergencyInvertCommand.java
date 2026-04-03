@@ -9,11 +9,18 @@ import frc.robot.Commands.XBOXDriveCommand;
 
 /**
  * Command that instantly flips the drive heading 180 degrees.
- * Used for emergency direction correction.
+ * 
+ * <p>Used for emergency direction correction when the driver presses the B button.
+ * Only affects the drive command's heading offset — does not modify odometry or vision.
  */
 public class EmergencyInvertCommand extends InstantCommand {
   private final XBOXDriveCommand driveCommand;
 
+  /**
+   * Constructs the EmergencyInvertCommand.
+   * 
+   * @param driveCommand The active XBOXDriveCommand to invert
+   */
   public EmergencyInvertCommand(XBOXDriveCommand driveCommand) {
     this.driveCommand = driveCommand;
   }

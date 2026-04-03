@@ -5,15 +5,9 @@
     "data": {
       "commands": [
         {
-          "type": "path",
-          "data": {
-            "pathName": "Back up and Shoot"
-          }
-        },
-        {
           "type": "named",
           "data": {
-            "name": "Shoot Sequence 10"
+            "name": "Shoot Sequence 5"
           }
         }
       ]

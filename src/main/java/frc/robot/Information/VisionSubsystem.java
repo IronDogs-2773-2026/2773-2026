@@ -25,6 +25,14 @@ import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
+/**
+ * Vision subsystem using PhotonVision for AprilTag-based pose estimation.
+ * 
+ * <p>Processes camera results using multi-tag and lowest-ambiguity pose strategies,
+ * then passes estimates to the odometry subsystem via a consumer callback.
+ * Standard deviations are dynamically adjusted based on tag count and distance
+ * to weight the trustworthiness of each vision measurement.
+ */
 public class VisionSubsystem extends SubsystemBase {
     private final PhotonCamera camera;
     private final PhotonPoseEstimator photonEstimator;

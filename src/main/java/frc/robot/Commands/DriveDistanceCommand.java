@@ -9,6 +9,8 @@ import frc.robot.SwerveSubsystems.DriveSubsystem;
  * Drives in a constant (dx, dy) field-relative direction at a fixed speed
  * until the robot has traveled the specified displacement, then stops.
  * No rotation is applied.
+ * 
+ * <p>Currently commented out in RobotContainer — not used in competition.
  */
 public class DriveDistanceCommand extends Command {
     private final DriveSubsystem driveSub;

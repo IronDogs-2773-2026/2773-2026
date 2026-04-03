@@ -15,6 +15,21 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 
+/**
+ * Global constants for the 2026 robot.
+ * 
+ * <p>Contains:
+ * <ul>
+ *   <li><b>Robot measurements</b> — Wheel distance, circumference, speed ratios</li>
+ *   <li><b>Motor CAN IDs</b> — Shooter motors (flywheel, feeder, arm, intake)</li>
+ *   <li><b>Swerve module CAN IDs</b> — Drive, rotation, and encoder IDs for all 4 modules</li>
+ *   <li><b>Speed limits</b> — Max drive, rotation, tower, auto, and slowdown factors</li>
+ *   <li><b>Controller deadzones</b> — Xbox and HOTAS deadzone thresholds</li>
+ *   <li><b>Swerve kinematics</b> — Module locations and kinematics object</li>
+ *   <li><b>Vision constants</b> — Camera name, robot-to-camera transform, AprilTag layout,
+ *       and standard deviation values for pose estimation</li>
+ * </ul>
+ */
 @SuppressWarnings({"ConstantName", "MemberName"})
 public class Constants {
   public static final int kDriverControllerPort = 0;

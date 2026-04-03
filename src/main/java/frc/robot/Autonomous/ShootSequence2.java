@@ -10,6 +10,7 @@ import frc.robot.Commands.ShootSequenceCommand;
 
 /**
  * Runs a shoot sequence with 2 second feed time.
+ * Flywheel: 0.7, Feeder: 0.6, Spinup: 1.5s, Feed: 2s.
  */
 public class ShootSequence2 extends Command {
   private final Command m_sequence;

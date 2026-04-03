@@ -12,6 +12,15 @@ import edu.wpi.first.math.numbers.N4;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+/**
+ * Subsystem for processing AprilTag data from a UDP socket connection.
+ * 
+ * <p>Receives tag detection data over UDP on port 5800, parses fiducial IDs
+ * and relative positions, then optionally feeds odometry corrections.
+ * 
+ * <p>Currently the servo motor control is commented out. The subsystem
+ * provides tag data via Shuffleboard dashboard widgets.
+ */
 public class TagSubsystem extends SubsystemBase {
     //Subsystems
     OdometrySubsystem odomSub;

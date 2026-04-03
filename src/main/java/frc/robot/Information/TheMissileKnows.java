@@ -23,6 +23,16 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.SwerveSubsystems.DriveSubsystem;
 
+/**
+ * Alternative combined odometry + vision subsystem.
+ * 
+ * <p>Currently not used — {@link OdometrySubsystem} and {@link VisionSubsystem}
+ * are the active systems. Merges NavX gyro, wheel odometry, and PhotonVision
+ * AprilTag detection into a single pose estimator with dynamic standard deviations
+ * based on tag ambiguity and distance.
+ * 
+ * <p>Named as a joke — "The Missile Knows" where the missile is the robot.
+ */
 public class TheMissileKnows extends SubsystemBase {
   private final DriveSubsystem drive;
   private final PhotonCamera camera;

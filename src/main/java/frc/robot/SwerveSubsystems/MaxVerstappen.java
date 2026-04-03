@@ -11,6 +11,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Information.TheMissileKnows;
 
+/**
+ * Alternative swerve drive subsystem using {@link TheMissileKnows} for odometry.
+ * 
+ * <p>Currently not used — {@link DriveSubsystem} is the active drive subsystem.
+ * Named after the F1 driver Max Verstappen.
+ */
 public class MaxVerstappen extends SubsystemBase {
   private final TheMissileKnows odomSub;
 

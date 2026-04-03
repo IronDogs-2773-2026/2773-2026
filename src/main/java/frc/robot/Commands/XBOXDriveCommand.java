@@ -13,6 +13,24 @@ import frc.robot.Constants;
 import frc.robot.Information.OdometrySubsystem;
 import frc.robot.SwerveSubsystems.DriveSubsystem;
 
+/**
+ * Default teleop drive command using an Xbox controller for field-relative control.
+ * 
+ * <p>Controls:
+ * <ul>
+ *   <li><b>Left Stick</b> — Translation (X/Y)</li>
+ *   <li><b>Right Stick</b> — Rotation (Z)</li>
+ *   <li><b>Right Trigger &gt; 0.5</b> — Slowdown mode (0.6x speed)</li>
+ *   <li><b>POV Up/Down</b> — Adjust drive sensitivity</li>
+ *   <li><b>POV Direction</b> — POV-locked rotation (PID to cardinal directions)</li>
+ *   <li><b>Buttons 7+8</b> — Reset gyro heading offset</li>
+ *   <li><b>Button 1</b> — Toggle setpoint rotation mode</li>
+ * </ul>
+ * 
+ * <p>Field-relative driving uses a captured {@code driveHeadingOffset} at command init
+ * to establish "forward" as the robot's facing direction at teleop start. The gyro
+ * is NOT reset — only the delta from init is used.
+ */
 public class XBOXDriveCommand extends Command {
   private final DriveSubsystem driveSubsystem;
   private final XboxController xbox;
@@ -31,7 +49,13 @@ public class XBOXDriveCommand extends Command {
   // Drive heading offset — set when driver presses 7+8, does not affect odometry/vision
   private double driveHeadingOffset = 0;
 
-  /** Creates a new DriveCommand. */
+  /**
+   * Constructs the XBOXDriveCommand.
+   * 
+   * @param driveSub The drive subsystem to control
+   * @param xbox The driver's Xbox controller (port 0)
+   * @param odomSub The odometry subsystem for gyro and pose data
+   */
   public XBOXDriveCommand(DriveSubsystem driveSub, XboxController xbox, OdometrySubsystem odomSub) {
     this.driveSubsystem = driveSub;
     this.xbox = xbox;
@@ -42,7 +66,10 @@ public class XBOXDriveCommand extends Command {
     addRequirements(driveSub);
   }
 
-  // Called when the command is initially scheduled.
+  /**
+   * Called when the command is initially scheduled.
+   * Captures the current gyro angle as the "forward" reference for field-relative driving.
+   */
   @Override
   public void initialize() {
     driveHeadingOffset = odomSub.getGyroAngle();
@@ -60,7 +87,7 @@ public class XBOXDriveCommand extends Command {
     // Check right trigger for slowdown mode
     slowdownFactor = xbox.getRightTriggerAxis() > 0.5 ? Constants.SlowdownFactor : 0.9;
     
-    double XAxis = -xbox.getLeftX(), YAxis = -xbox.getLeftY(), ZAxis = -xbox.getRightX();
+    double XAxis = -xbox.getLeftX(), YAxis = xbox.getLeftY(), ZAxis = xbox.getRightX();
     
     // Calculate base angle from joystick
     double rawAngle = Math.atan2(YAxis, XAxis);
@@ -159,7 +186,10 @@ public double povRotate() {
     return xbox.getRawButtonPressed(i);
   }
 
-  /** Flip drive heading 180 degrees for emergency invert */
+  /**
+   * Flips the drive heading offset by 180 degrees for emergency invert.
+   * Called by {@link EmergencyInvertCommand} when the B button is pressed.
+   */
   public void invertHeading() {
     driveHeadingOffset += Math.PI;
     System.out.println("Emergency 180° Invert Triggered!");

@@ -22,7 +22,7 @@ public class ShootSequence15 extends Command {
    * @param shooterSub Shooter subsystem
    */
   public ShootSequence15(ShooterSubsystem shooterSub) {
-    m_sequence = new ShootSequenceCommand(shooterSub, 0.7, 0.6, 15, 1.5);
+    m_sequence = new ShootSequenceCommand(shooterSub, 0.7, -0.6, 15, 1.5);
     addRequirements(shooterSub);
   }
 

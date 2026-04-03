@@ -232,7 +232,7 @@ public class RobotContainer {
 
     // Simple shoot-only auto (no PathPlanner)
     try {
-      autoChooser.addOption("Simple Shoot", new ShootSequenceCommand(shooterSub, 0.55, 0.75, 9.0, 1.5));
+      autoChooser.addOption("Simple Shoot", new ShootSequenceCommand(shooterSub, 0.55, -0.75, 9.0, 1.5));
       System.out.println("RobotContainer: SUCCESS - Added 'Simple Shoot' to chooser");
     } catch (Exception e) {
       System.err.println("FAILED to load 'Simple Shoot': " + e.getMessage());

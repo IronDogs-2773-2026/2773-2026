@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "Shoot Sequence 5"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Bump to Neutral"

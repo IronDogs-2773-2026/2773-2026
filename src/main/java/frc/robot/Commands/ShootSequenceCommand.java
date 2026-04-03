@@ -4,13 +4,13 @@
 
 package frc.robot.Commands;
 
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.ShooterSubsystem;
 
 /**
  * One-button shoot sequence command.
- * 
+ *
  * <p>Executes the following sequence:
  * <ol>
  *   <li>Spin up flywheel to target speed</li>
@@ -18,16 +18,14 @@ import frc.robot.ShooterSubsystem;
  *   <li>Run feeder to shoot game piece</li>
  *   <li>Stop all shooter motors</li>
  * </ol>
- * 
+ *
  * <p>Used for both teleop (right trigger) and PathPlanner named commands.
  */
-public class ShootSequenceCommand extends Command {
-  private final Command sequence;
-  private final double spinupTime;
+public class ShootSequenceCommand extends SequentialCommandGroup {
 
   /**
    * Constructs the ShootSequenceCommand.
-   * 
+   *
    * @param shooterSub Shooter subsystem
    * @param flywheelSpeed Flywheel speed (-1.0 to 1.0)
    * @param feederSpeed Feeder speed (-1.0 to 1.0)
@@ -35,44 +33,19 @@ public class ShootSequenceCommand extends Command {
    * @param spinupTime How long to wait before feeding (seconds)
    */
   public ShootSequenceCommand(ShooterSubsystem shooterSub, double flywheelSpeed, double feederSpeed, double shootTime, double spinupTime) {
-    this.spinupTime = spinupTime;
-    
-    // Build the sequence: spin up → wait → shoot → stop
-    this.sequence = Commands.sequence(
+    addCommands(
       // Spin up flywheel
       Commands.runOnce(() -> shooterSub.directRun(flywheelSpeed), shooterSub),
-      
+
       // Wait for flywheel to spin up
       Commands.waitSeconds(spinupTime),
-      
+
       // Run feeder to shoot the note
-      Commands.run(() -> shooterSub.runFeeder(feederSpeed), shooterSub)
+      Commands.runEnd(() -> shooterSub.runFeeder(feederSpeed), () -> shooterSub.runFeeder(0), shooterSub)
         .withTimeout(shootTime),
-      
+
       // Stop all motors
       Commands.runOnce(() -> shooterSub.stop(), shooterSub)
     );
-    
-    addRequirements(shooterSub);
-  }
-
-  @Override
-  public void initialize() {
-    sequence.initialize();
-  }
-
-  @Override
-  public void execute() {
-    sequence.execute();
-  }
-
-  @Override
-  public void end(boolean interrupted) {
-    sequence.end(interrupted);
-  }
-
-  @Override
-  public boolean isFinished() {
-    return sequence.isFinished();
   }
 }

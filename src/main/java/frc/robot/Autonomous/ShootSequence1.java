@@ -16,7 +16,7 @@ public class ShootSequence1 extends Command {
   private final Command m_sequence;
 
   public ShootSequence1(ShooterSubsystem shooterSub) {
-    m_sequence = new ShootSequenceCommand(shooterSub, 0.7, 0.6, 1, 1.5);
+    m_sequence = new ShootSequenceCommand(shooterSub, 0.7, -0.6, 1, 1.5);
     addRequirements(shooterSub);
   }
 

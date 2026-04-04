@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Autonomous.ManualBackupAndShoot;
 import frc.robot.Autonomous.ShootSequence1;
 import frc.robot.Autonomous.ShootSequence10;
 import frc.robot.Autonomous.ShootSequence15;
@@ -239,6 +240,15 @@ public class RobotContainer {
       e.printStackTrace();
     }
 
+    // Manual backup and shoot auto (no PathPlanner)
+    try {
+      autoChooser.addOption("Manual Backup & Shoot", new ManualBackupAndShoot(driveSub, odomSub, shooterSub));
+      System.out.println("RobotContainer: SUCCESS - Added 'Manual Backup & Shoot' to chooser");
+    } catch (Exception e) {
+      System.err.println("FAILED to load 'Manual Backup & Shoot': " + e.getMessage());
+      e.printStackTrace();
+    }
+
     // Alliance selector dropdown
     allianceChooser = new SendableChooser<>();
     allianceChooser.setDefaultOption("Use FMS", "fms");
@@ -328,11 +338,13 @@ public class RobotContainer {
 
     // POV Up: run arm up (hold to raise arm)
     new Trigger(() -> shooterXbox.getPOV() == 180)
-        .whileTrue(new RunCommand(() -> shooterSub.runArm(0.12), shooterSub));
+        .whileTrue(new RunCommand(() -> shooterSub.runArm(0.12))
+            .finallyDo(() -> shooterSub.runArm(0)));
 
     // POV Down: run arm down (hold to lower arm)
     new Trigger(() -> shooterXbox.getPOV() == 0)
-        .whileTrue(new RunCommand(() -> shooterSub.runArm(-0.4), shooterSub));
+        .whileTrue(new RunCommand(() -> shooterSub.runArm(-0.4))
+            .finallyDo(() -> shooterSub.runArm(0)));
 
     // Left bumper: reverse intake + feeder + flywheel outtake (for clearing jams)
     new JoystickButton(shooterXbox, XboxController.Button.kLeftBumper.value)

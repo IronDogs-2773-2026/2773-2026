@@ -68,11 +68,11 @@ public class XBOXDriveCommand extends Command {
 
   /**
    * Called when the command is initially scheduled.
-   * Captures the current gyro angle as the "forward" reference for field-relative driving.
+   * Uses absolute gyro zero as forward — ensures teleop aligns with auto calibration.
    */
   @Override
   public void initialize() {
-    driveHeadingOffset = odomSub.getGyroAngle();
+    driveHeadingOffset = 0;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
